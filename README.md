@@ -57,3 +57,4 @@ docs/             # Architecture, game design, and deployment docs
 ```
 
 > **Note:** This experience is an illustrative routing simulation, not a benchmark. Real performance and battery life depend on the model, software, and workload.
+

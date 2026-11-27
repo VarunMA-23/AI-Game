@@ -61,6 +61,9 @@ export const renderPersonaCard = async (input: {
   personaName: string
   topPriority: string
   modelCodes: string[]
+  cardTitle?: string
+  rarity?: string
+  stats?: { focus: number; creativity: number; privacy: number; batteryCare: number }
 }): Promise<PersonaCardImages> => {
   const payload = buildQrPayload({
     storeId: input.storeId,
@@ -71,7 +74,7 @@ export const renderPersonaCard = async (input: {
     errorCorrectionLevel: 'M',
     margin: 1,
     width: 420,
-    color: { dark: '#071426', light: '#FFFFFF' },
+    color: { dark: '#111827', light: '#FFFFFF' },
   })
   const image = new Image()
   await new Promise<void>((resolve, reject) => {
@@ -81,36 +84,53 @@ export const renderPersonaCard = async (input: {
   })
 
   const front = createContext()
-  front.context.fillStyle = '#071426'
+  front.context.fillStyle = '#FFFFFF'
   front.context.fillRect(0, 0, front.canvas.width, front.canvas.height)
-  front.context.fillStyle = '#00A8FF'
-  front.context.fillRect(0, 0, front.canvas.width, 16)
-  front.context.fillStyle = '#00E5FF'
-  front.context.font = '700 30px "Space Grotesk", sans-serif'
-  front.context.fillText('AI PC SHOWDOWN', 72, 92)
-  front.context.fillStyle = '#FFFFFF'
-  front.context.font = '700 70px "Space Grotesk", sans-serif'
-  front.context.fillText(input.personaName.toUpperCase(), 72, 190)
-  front.context.fillStyle = '#94A3B8'
-  front.context.font = '30px Inter, sans-serif'
-  front.context.fillText(`Top priority: ${input.topPriority}`, 72, 240)
-  front.context.fillText(input.storeName, 72, 282)
-  front.context.fillStyle = '#FFFFFF'
-  front.context.fillRect(240, 350, 420, 420)
-  front.context.drawImage(image, 240, 350, 420, 420)
-  front.context.fillStyle = '#94A3B8'
+  front.context.fillStyle = '#0068B5'
+  front.context.fillRect(0, 0, front.canvas.width, 18)
+  front.context.fillStyle = '#0068B5'
+  front.context.font = '700 28px "Space Grotesk", sans-serif'
+  front.context.fillText(
+    `AI PC SHOWDOWN · ${(input.rarity ?? 'RARE').toUpperCase()} TIER`,
+    72,
+    88,
+  )
+  front.context.fillStyle = '#111827'
+  front.context.font = '700 64px "Space Grotesk", sans-serif'
+  front.context.fillText(input.personaName.toUpperCase(), 72, 176)
+  front.context.fillStyle = '#4B5563'
+  front.context.font = '600 30px Inter, sans-serif'
+  front.context.fillText(
+    input.cardTitle ? `“${input.cardTitle}”` : `Top priority: ${input.topPriority}`,
+    72,
+    228,
+  )
+  if (input.stats) {
+    front.context.font = '600 24px Inter, sans-serif'
+    front.context.fillStyle = '#111827'
+    front.context.fillText(
+      `Focus ${input.stats.focus} · Creativity ${input.stats.creativity} · Privacy ${input.stats.privacy} · Battery ${input.stats.batteryCare}`,
+      72,
+      276,
+    )
+  }
+  front.context.fillStyle = '#4B5563'
   front.context.font = '24px Inter, sans-serif'
-  front.context.fillText('Scan for your saved persona and model codes.', 72, 900)
+  front.context.fillText(input.storeName, 72, 318)
+  front.context.drawImage(image, 240, 380, 420, 420)
+  front.context.fillStyle = '#4B5563'
+  front.context.font = '24px Inter, sans-serif'
+  front.context.fillText('Your plan is ready when you are — scan to save.', 72, 880)
 
   const back = createContext()
-  back.context.fillStyle = '#071426'
+  back.context.fillStyle = '#FFFFFF'
   back.context.fillRect(0, 0, back.canvas.width, back.canvas.height)
-  back.context.fillStyle = '#00A8FF'
-  back.context.fillRect(0, 0, back.canvas.width, 16)
-  back.context.fillStyle = '#00E5FF'
+  back.context.fillStyle = '#0068B5'
+  back.context.fillRect(0, 0, back.canvas.width, 18)
+  back.context.fillStyle = '#0068B5'
   back.context.font = '700 34px "Space Grotesk", sans-serif'
   back.context.fillText('SHOPPER CHECKLIST', 72, 110)
-  back.context.fillStyle = '#FFFFFF'
+  back.context.fillStyle = '#111827'
   back.context.font = '28px Inter, sans-serif'
   let y = 190
   checklist.forEach((item, index) => {

@@ -110,4 +110,8 @@ export interface HandoffRecord {
   persona: PersonaId
   modelCode: string | null
   createdAt: number
+  cardTitle?: string
+  rarity?: string
+  bundleLabel?: string
+  budgetMax?: number
 }

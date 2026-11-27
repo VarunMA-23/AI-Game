@@ -6,6 +6,7 @@ import { useDeadlineNavigation } from '../challenges/useDeadlineNavigation'
 import { useRequireSession } from '../challenges/useRequireSession'
 import { buildCompetitorRows, competitorClasses } from '../competitors/competitorContent'
 import { FIT_CLOSING_LINE, buildFitRows } from '../fit-panel/fitPanel'
+import { buildWeeklyReport } from '../recommendations/weeklyReport'
 import { buildComparisonRows } from '../value-compare/valueCompare'
 import { checkStoreReadiness } from '../store-readiness/gate'
 import { loadInventory } from '../../services/inventory/loadInventory'
@@ -29,11 +30,13 @@ export default function ValueScreen() {
   const startedAt = useGameStore((state) => state.startedAt)
   const persona = useGameStore((state) => state.persona)
   const codes = useGameStore((state) => state.recommendedModelCodes)
+  const packetRoutes = useGameStore((state) => state.packetRoutes)
   const setPhase = useGameStore((state) => state.setPhase)
   const [competitorId, setCompetitorId] = useState(competitorClasses[0]?.id ?? '')
   const inventory = useMemo(() => loadInventory(storeId), [storeId])
   const readiness = useMemo(() => checkStoreReadiness(inventory), [inventory])
   const definition = getPersonaDefinition(persona)
+  const weeklyReport = useMemo(() => buildWeeklyReport(packetRoutes), [packetRoutes])
   const competitor =
     competitorClasses.find((item) => item.id === competitorId) ?? competitorClasses[0]
   const competitorRows = competitor ? buildCompetitorRows(competitor, definition) : []
@@ -66,18 +69,46 @@ export default function ValueScreen() {
 
   return (
     <EndingFrame
-      kicker="Compare before you decide"
-      title="WHY THIS FITS YOU."
+      kicker="Personalized Plan & Comparison"
+      title="YOUR AI PC WEEK."
       footer={
         <button
           type="button"
           className="primary-button"
           onClick={() => navigate('/next-step')}
         >
-          Next: Your Specialist <ArrowRight size={18} aria-hidden="true" />
+          Next: Save &amp; Specialist <ArrowRight size={18} aria-hidden="true" />
         </button>
       }
     >
+      <section className="value-section weekly-report-box">
+        <h2>Your AI PC Week (Estimate)</h2>
+        <div className="weekly-summary-strip">
+          <span>
+            <strong>~{weeklyReport.totalEstimatedHoursOffloaded} hrs/week</strong> offloaded to The Quiet Assistant (estimate)
+          </span>
+          <span>
+            <strong>{weeklyReport.estimatedBatteryGainPct}</strong> illustrative battery headroom gain (estimate)
+          </span>
+        </div>
+        <div className="fit-grid">
+          {weeklyReport.tasks.map((item) => (
+            <article key={item.task} className="fit-row">
+              <h3>{item.task}</h3>
+              <p>
+                <strong>{item.engine}</strong> · {item.estimatedHoursPerWeek}
+              </p>
+              <small>{item.benefitNote}</small>
+            </article>
+          ))}
+        </div>
+        <ul className="disclosure">
+          {weeklyReport.assumptions.map((assumption) => (
+            <li key={assumption}>{assumption}</li>
+          ))}
+        </ul>
+      </section>
+
       {readiness.ready && rows.length > 0 ? (
         <section className="value-section">
           <h2>Top pick vs cheapest in-stock model</h2>
@@ -105,11 +136,7 @@ export default function ValueScreen() {
             ))}
           </ul>
         </section>
-      ) : (
-        <div className="fallback-panel">
-          <p>Our team will match you to the best in-stock model.</p>
-        </div>
-      )}
+      ) : null}
 
       <section className="value-section">
         <h2>Why this fits you</h2>

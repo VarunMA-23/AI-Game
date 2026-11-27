@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Award } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import EndingFrame from '../../components/common/EndingFrame'
 import { gameConfig } from '../../game/config/loadConfig'
+import { buildCollectibleCard } from '../recommendations/collectibleCard'
 import { buildScoringSummary } from '../recommendations/scoringSummary'
 import { useDeadlineNavigation } from '../challenges/useDeadlineNavigation'
 import { useRequireSession } from '../challenges/useRequireSession'
@@ -27,6 +28,7 @@ export default function PersonaRevealScreen() {
     startedAt,
     completedAt,
   })
+  const card = buildCollectibleCard(persona, scores, summary.total)
 
   useIdleReset(45000)
   useDeadlineNavigation(startedAt, 152000, '/store')
@@ -41,8 +43,8 @@ export default function PersonaRevealScreen() {
 
   return (
     <EndingFrame
-      kicker="Identity unlocked"
-      title="YOU'VE UNLOCKED YOUR AI PC IDENTITY."
+      kicker="Collectible Persona Card"
+      title="YOUR AI PC TRADING CARD."
       footer={
         <button
           type="button"
@@ -53,8 +55,39 @@ export default function PersonaRevealScreen() {
         </button>
       }
     >
-      <div className="persona-result">
-        <div className="persona-name">{definition.name}</div>
+      <div className={`trading-card trading-card--${card.rarity.toLowerCase()}`}>
+        <div className="trading-card-top">
+          <span className="rarity-pill">
+            <Award size={16} aria-hidden="true" />
+            {card.rarity} Tier
+          </span>
+          <span className="trading-card-score">{summary.total} / 1000 PTS</span>
+        </div>
+
+        <div className="trading-card-identity">
+          <div className="persona-name">{definition.name}</div>
+          <p className="trading-card-title">“{card.title}”</p>
+        </div>
+
+        <div className="trading-stats-grid" aria-label="Persona stat block">
+          <div className="trading-stat">
+            <span>Focus</span>
+            <strong>{card.stats.focus}</strong>
+          </div>
+          <div className="trading-stat">
+            <span>Creativity</span>
+            <strong>{card.stats.creativity}</strong>
+          </div>
+          <div className="trading-stat">
+            <span>Privacy</span>
+            <strong>{card.stats.privacy}</strong>
+          </div>
+          <div className="trading-stat">
+            <span>Battery Care</span>
+            <strong>{card.stats.batteryCare}</strong>
+          </div>
+        </div>
+
         <ul className="priority-list">
           {definition.priorities.map((priority) => (
             <li key={priority}>{priority}</li>
@@ -64,7 +97,7 @@ export default function PersonaRevealScreen() {
 
       <div className="race-result">
         <div className="race-result-row">
-          <span>Without NPU routing</span>
+          <span>Ghost Laptop (No NPU)</span>
           <div className="race-result-track">
             <span
               className="race-result-fill race-result-fill--left"
@@ -73,7 +106,7 @@ export default function PersonaRevealScreen() {
           </div>
         </div>
         <div className="race-result-row">
-          <span>With NPU routing</span>
+          <span>AI PC (With NPU)</span>
           <div className="race-result-track">
             <span
               className="race-result-fill race-result-fill--right"
@@ -82,13 +115,6 @@ export default function PersonaRevealScreen() {
           </div>
         </div>
         <p className="disclosure">{gameConfig.race.disclosure}</p>
-      </div>
-
-      <div className="score-strip">
-        <span>{summary.total} / 1000</span>
-        <span>{summary.completedCount} of 5 completed</span>
-        <span>{summary.achievement}</span>
-        <span>{Math.round(summary.durationMs / 1000)}s in session</span>
       </div>
     </EndingFrame>
   )

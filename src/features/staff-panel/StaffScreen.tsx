@@ -87,8 +87,17 @@ export default function StaffScreen({ onClose }: { onClose: () => void }) {
             ) : (
               handoffs.map((handoff) => (
                 <article key={handoff.createdAt} className="handoff-row">
-                  <span>{handoff.persona}</span>
-                  <span>{handoff.modelCode ?? 'No model viewed'}</span>
+                  <div className="handoff-context">
+                    <strong>
+                      {handoff.persona}
+                      {handoff.cardTitle ? ` — “${handoff.cardTitle}”` : ''}
+                      {handoff.rarity ? ` (${handoff.rarity})` : ''}
+                    </strong>
+                    <span>
+                      Track: {handoff.bundleLabel ?? 'General'} · Model: {handoff.modelCode ?? 'No model'}
+                      {handoff.budgetMax ? ` · Max ₹${handoff.budgetMax.toLocaleString('en-IN')}` : ''}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     className="small-button"

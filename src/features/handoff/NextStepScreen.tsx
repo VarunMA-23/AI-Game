@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
-import { Download, MessageSquareText, RotateCcw, Save } from 'lucide-react'
+import { Check, Download, Lock, MessageSquareText, RotateCcw, Save } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import EndingFrame from '../../components/common/EndingFrame'
 import { useRequireSession } from '../challenges/useRequireSession'
 import { buildQrPayload } from '../persona-card/qrPayload'
 import { renderPersonaCard } from '../persona-card/personaCard'
 import type { PersonaCardImages } from '../persona-card/personaCard'
+import { buildCollectibleCard } from '../recommendations/collectibleCard'
+import { buildScoringSummary } from '../recommendations/scoringSummary'
 import { loadInventory } from '../../services/inventory/loadInventory'
 import { getPersonaDefinition } from '../../services/recommendations/loadPersona'
 import { addHandoff } from '../../services/storage/handoffStorage'
@@ -21,6 +23,12 @@ export default function NextStepScreen() {
   const storeId = useGameStore((state) => state.storeId)
   const persona = useGameStore((state) => state.persona)
   const codes = useGameStore((state) => state.recommendedModelCodes)
+  const scores = useGameStore((state) => state.challengeScores)
+  const statuses = useGameStore((state) => state.challengeStatus)
+  const startedAt = useGameStore((state) => state.startedAt)
+  const completedAt = useGameStore((state) => state.completedAt)
+  const selectedBundle = useGameStore((state) => state.selectedBundle)
+  const maxBudget = useGameStore((state) => state.maxBudget)
   const handoffPending = useGameStore((state) => state.handoffPending)
   const setPhase = useGameStore((state) => state.setPhase)
   const finishSession = useGameStore((state) => state.finishSession)
@@ -28,8 +36,11 @@ export default function NextStepScreen() {
   const resetSession = useGameStore((state) => state.resetSession)
   const inventory = useMemo(() => loadInventory(storeId), [storeId])
   const definition = getPersonaDefinition(persona)
+  const summary = buildScoringSummary({ scores, statuses, startedAt, completedAt })
+  const cardMeta = buildCollectibleCard(persona, scores, summary.total)
   const [qrImage, setQrImage] = useState('')
   const [cardImages, setCardImages] = useState<PersonaCardImages | null>(null)
+  const [remindOptIn, setRemindOptIn] = useState(false)
 
   useIdleReset(45000)
 
@@ -50,6 +61,10 @@ export default function NextStepScreen() {
       storeId,
       persona,
       modelCode: codes[0] ?? null,
+      cardTitle: cardMeta.title,
+      rarity: cardMeta.rarity,
+      bundleLabel: selectedBundle ?? 'General',
+      budgetMax: maxBudget,
     })
     setHandoffPending(true)
     recordEndingAction(sessionId, 'specialist')
@@ -64,7 +79,7 @@ export default function NextStepScreen() {
       QRCode.toDataURL(payload, {
         margin: 1,
         width: 420,
-        color: { dark: '#071426', light: '#FFFFFF' },
+        color: { dark: '#111827', light: '#FFFFFF' },
       }),
       renderPersonaCard({
         storeName: inventory.storeName,
@@ -73,6 +88,9 @@ export default function NextStepScreen() {
         personaName: definition.name,
         topPriority: definition.priorities[0] ?? '',
         modelCodes: codes,
+        cardTitle: cardMeta.title,
+        rarity: cardMeta.rarity,
+        stats: cardMeta.stats,
       }),
     ])
     setQrImage(qr)
@@ -92,11 +110,21 @@ export default function NextStepScreen() {
       footer={
         <span className="ending-progress">
           {handoffPending
-            ? 'A specialist has been asked to find you.'
+            ? `A specialist has your ${cardMeta.title} card & ${selectedBundle ?? 'store'} preferences.`
             : 'No personal details are collected.'}
         </span>
       }
     >
+      <div className="privacy-closing-hook">
+        <Lock size={22} aria-hidden="true" />
+        <div>
+          <strong>What leaves your device? With on-device AI, your files stay yours.</strong>
+          <p>
+            Compatible apps run summaries, blur, and creative edits locally on the NPU — no cloud upload required.
+          </p>
+        </div>
+      </div>
+
       <div className="next-step-actions">
         <button
           type="button"
@@ -104,11 +132,11 @@ export default function NextStepScreen() {
           onClick={handleSpecialist}
           disabled={!persona || handoffPending}
         >
-          {handoffPending ? 'SPECIALIST ASKED' : 'ASK A SPECIALIST'}
+          {handoffPending ? 'SPECIALIST HAS YOUR CONTEXT' : 'ASK A SPECIALIST'}
           <MessageSquareText size={24} aria-hidden="true" />
         </button>
         <button type="button" className="secondary-button" onClick={handleSave} disabled={!persona}>
-          SAVE YOUR PICKS
+          SAVE &amp; REMIND (QR)
           <Save size={22} aria-hidden="true" />
         </button>
         <button type="button" className="text-button" onClick={handlePlayAgain}>
@@ -117,21 +145,38 @@ export default function NextStepScreen() {
         </button>
       </div>
 
+      <label className="remind-optin">
+        <input
+          type="checkbox"
+          checked={remindOptIn}
+          onChange={(e) => setRemindOptIn(e.target.checked)}
+        />
+        <span>
+          {remindOptIn ? (
+            <>
+              <Check size={15} aria-hidden="true" /> Your plan is ready when you are — scan the QR below to keep it on your phone.
+            </>
+          ) : (
+            'Opt in to save a low-pressure reminder with your QR plan (no email or phone number needed).'
+          )}
+        </span>
+      </label>
+
       {qrImage || cardImages ? (
         <div className="saved-picks">
           {qrImage ? (
             <figure>
               <img src={qrImage} alt="QR code with your persona and saved model codes" />
-              <figcaption>Phone-scannable QR</figcaption>
+              <figcaption>Your plan is ready when you are</figcaption>
             </figure>
           ) : null}
           {cardImages ? (
             <>
               <figure>
-                <img src={cardImages.front} alt="Front of your shareable persona card" />
+                <img src={cardImages.front} alt="Front of your collectible persona trading card" />
                 <figcaption>
                   <a href={cardImages.front} download="ai-pc-persona-card-front.png">
-                    SAVE FRONT
+                    SAVE CARD FRONT
                     <Download size={18} aria-hidden="true" />
                   </a>
                 </figcaption>
@@ -140,7 +185,7 @@ export default function NextStepScreen() {
                 <img src={cardImages.back} alt="Back of your persona card with shopper checklist" />
                 <figcaption>
                   <a href={cardImages.back} download="ai-pc-persona-card-back.png">
-                    SAVE BACK
+                    SAVE CHECKLIST BACK
                     <Download size={18} aria-hidden="true" />
                   </a>
                 </figcaption>

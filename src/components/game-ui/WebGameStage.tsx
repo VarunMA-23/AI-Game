@@ -1,9 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Check, Cpu, RotateCcw, ShieldCheck, ShieldAlert } from 'lucide-react'
+import {
+  ArrowRight,
+  Check,
+  Cpu,
+  Fan,
+  Lock,
+  RotateCcw,
+  ShieldAlert,
+  ShieldCheck,
+  UploadCloud,
+} from 'lucide-react'
 import { allPackets, gameConfig, getChallenge, getChallengeByIndex } from '../../game/config/loadConfig'
+import { ENGINE_CHARACTERS, getCharacterVoiceLine } from '../../game/characters'
 import { gameBus } from '../../game/events/bus'
-import { computeRaceProgress, resolveRoute } from '../../game/race/routing'
-import { batteryDrainFor, scoreBatteryEscape } from '../../game/scoring/batteryEscape'
+import { computeRaceProgress, resolveRoute, routeIsCorrect } from '../../game/race/routing'
+import { scoreBatteryEscape } from '../../game/scoring/batteryEscape'
 import type { BatteryEscapeChoice } from '../../game/scoring/batteryEscape'
 import { scoreCreatorMode } from '../../game/scoring/creatorMode'
 import type { PacketChoice } from '../../game/scoring/creatorMode'
@@ -12,21 +23,17 @@ import type { ProcessingChoice } from '../../game/scoring/privacyShield'
 import { scoreStreamNight } from '../../game/scoring/streamNight'
 import type { StreamNightChoice } from '../../game/scoring/streamNight'
 import { scoreStudySprint } from '../../game/scoring/studySprint'
+import { playCompleteChord, playGoodChime, playWarnHum } from '../../services/audio/kioskAudio'
 import { useGameStore } from '../../store/gameStore'
 import type { ChallengeDefinition, ChallengeId, Engine, PacketRoute } from '../../types/game'
+import LiveOnDeviceDemo from './LiveOnDeviceDemo'
 
 const ENGINES: Engine[] = ['CPU', 'GPU', 'NPU']
-
-const ENGINE_HINTS: Record<Engine, string> = {
-  CPU: 'General tasks',
-  GPU: 'Graphics & video',
-  NPU: 'On-device AI',
-}
 
 interface ChallengeProps {
   challenge: ChallengeDefinition
   elapsedMs: () => number
-  onRoute: (packetId: string, engine: Engine) => { engine: Engine; fellBack: boolean }
+  onRoute: (packetId: string, engine: Engine) => { engine: Engine; fellBack: boolean; isGood: boolean }
   onProgress: (score: number) => void
   onComplete: (score: number, subscores?: Record<string, number>) => void
   onFeedback: (text: string, tone?: 'neutral' | 'success' | 'warn') => void
@@ -43,19 +50,66 @@ function EngineButtons({
 }) {
   return (
     <div className="web-engine-grid">
-      {ENGINES.map((engine) => (
-        <button
-          key={engine}
-          type="button"
-          disabled={disabled}
-          className={`web-engine-btn ${selected === engine ? 'web-engine-btn--active' : ''}`}
-          onClick={() => onSelect(engine)}
-        >
-          <span className="web-engine-name">{engine}</span>
-          <span className="web-engine-hint">{ENGINE_HINTS[engine]}</span>
-        </button>
-      ))}
+      {ENGINES.map((engine) => {
+        const char = ENGINE_CHARACTERS[engine]
+        return (
+          <button
+            key={engine}
+            type="button"
+            disabled={disabled}
+            className={`web-engine-btn ${selected === engine ? 'web-engine-btn--active' : ''}`}
+            onClick={() => onSelect(engine)}
+          >
+            <span className="web-engine-name">{char.name}</span>
+            <span className="web-engine-hint">
+              {engine} · {char.role}
+            </span>
+          </button>
+        )
+      })}
     </div>
+  )
+}
+
+function GhostLaptopPanel({
+  routedCount,
+  fallbacks,
+}: {
+  routedCount: number
+  fallbacks: number
+}) {
+  const fanLevel = routedCount === 0 ? 'Quiet' : routedCount < 3 ? 'Warming up' : 'Loud (Max RPM)'
+  const ghostBattery = Math.max(18, 100 - routedCount * 14 - fallbacks * 6)
+  const queued = Math.max(0, routedCount - 1)
+
+  return (
+    <aside className="ghost-laptop-panel" aria-label="Illustrative Ghost Laptop comparison">
+      <div className="ghost-laptop-head">
+        <span className="ghost-badge">ILLUSTRATION · NO NPU</span>
+        <strong>Standard Ghost Laptop</strong>
+      </div>
+      <div className="ghost-stat">
+        <span><Fan size={14} aria-hidden="true" /> Fan noise</span>
+        <strong className={routedCount >= 3 ? 'web-tone-warn' : ''}>{fanLevel}</strong>
+      </div>
+      <div className="ghost-stat">
+        <span>Headroom meter</span>
+        <strong className={ghostBattery < 50 ? 'web-tone-warn' : ''}>{ghostBattery}%</strong>
+      </div>
+      <div className="web-meter-track">
+        <div
+          className={`web-meter-fill ${ghostBattery >= 60 ? 'web-meter-fill--info' : 'web-meter-fill--warn'}`}
+          style={{ width: `${ghostBattery}%` }}
+        />
+      </div>
+      <div className="ghost-stat">
+        <span>Queued on CPU/GPU</span>
+        <strong>{queued} task{queued === 1 ? '' : 's'} waiting</strong>
+      </div>
+      <p className="ghost-note">
+        Illustrative only: without an NPU, every AI effect competes on the main processors.
+      </p>
+    </aside>
   )
 }
 
@@ -94,7 +148,7 @@ function StudySprintView({
     )
     onProgress(score)
     if (next.length === 5) {
-      onFeedback('Summary ready! Now choose which engine should run it.', 'success')
+      onFeedback('Summary ready! Choose which character should run it.', 'success')
     } else {
       onFeedback(`Selected ${next.length} of 5 concepts.`)
     }
@@ -114,8 +168,12 @@ function StudySprintView({
       },
       gameConfig.scoring,
     )
-    onRoute('notes-summary', engine)
+    const outcome = onRoute('notes-summary', engine)
     setRoutedEngine(engine)
+    onFeedback(
+      getCharacterVoiceLine(engine, outcome.isGood),
+      outcome.isGood ? 'success' : 'warn',
+    )
     onComplete(score)
   }
 
@@ -211,6 +269,7 @@ function CreatorModeView({
     setSequence(nextSeq)
 
     if (toolId !== expected) {
+      playWarnHum()
       onFeedback('That tool is out of order. Click Reset to try again.', 'warn')
       recompute(nextSeq, choices)
       return
@@ -233,15 +292,13 @@ function CreatorModeView({
     const outcome = onRoute(pendingPacketId, engine)
     const nextChoices = {
       ...choices,
-      [pendingPacketId]: outcome,
+      [pendingPacketId]: { engine: outcome.engine, fellBack: outcome.fellBack },
     }
     setChoices(nextChoices)
     setPendingPacketId(null)
     onFeedback(
-      outcome.fellBack
-        ? `Fell back to ${outcome.engine}. Continue to the next step.`
-        : `Routed to ${outcome.engine}. Continue to the next step.`,
-      outcome.fellBack ? 'warn' : 'success',
+      getCharacterVoiceLine(engine, outcome.isGood),
+      outcome.isGood ? 'success' : 'warn',
     )
     recompute(sequence, nextChoices)
   }
@@ -317,6 +374,7 @@ function PrivacyShieldView({
 }: ChallengeProps) {
   const [choice, setChoice] = useState<ProcessingChoice | null>(null)
   const [leakChoice, setLeakChoice] = useState<string | null>(null)
+  const [showLiveProof, setShowLiveProof] = useState(false)
   const followUp = challenge.followUp
 
   const computeScore = (c: ProcessingChoice | null, leak: string | null) =>
@@ -336,8 +394,8 @@ function PrivacyShieldView({
     onRoute('confidential-document', picked === 'local' ? 'NPU' : 'CPU')
     onFeedback(
       picked === 'local'
-        ? 'Document stays on this device! Now answer the follow-up question below.'
-        : 'Document leaves this device for a cloud service. Answer the follow-up below.',
+        ? 'The Quiet Assistant: "Kept 100% on-device. Now answer the follow-up below."'
+        : 'Cloud route sent the document off-device. Answer the follow-up below.',
       picked === 'local' ? 'success' : 'warn',
     )
     onProgress(computeScore(picked, leakChoice))
@@ -353,10 +411,33 @@ function PrivacyShieldView({
 
   return (
     <div className="web-challenge-body">
-      <div className="web-doc-banner">
-        <strong>CONFIDENTIAL CONTRACT</strong>
-        <span>Fictional sample document — choose where AI summarizes it</span>
+      <div className={`privacy-meter-banner ${choice === 'cloud' ? 'privacy-meter-banner--cloud' : 'privacy-meter-banner--local'}`}>
+        <div className="privacy-meter-title">
+          {choice === 'cloud' ? (
+            <>
+              <UploadCloud size={20} aria-hidden="true" />
+              <strong>What leaves your device? Document uploaded to external cloud</strong>
+            </>
+          ) : (
+            <>
+              <Lock size={20} aria-hidden="true" />
+              <strong>
+                What leaves your device?{' '}
+                {choice === 'local' ? '0% — Everything stays on this laptop' : 'Pending your choice'}
+              </strong>
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          className="small-button"
+          onClick={() => setShowLiveProof((v) => !v)}
+        >
+          {showLiveProof ? 'Hide Live Offline Proof' : 'Try Live Offline Proof'}
+        </button>
       </div>
+
+      {showLiveProof && <LiveOnDeviceDemo />}
 
       <div className="web-privacy-grid">
         <button
@@ -366,8 +447,8 @@ function PrivacyShieldView({
           onClick={() => handleRoute('local')}
         >
           <ShieldCheck size={28} aria-hidden="true" />
-          <strong>Process on this device</strong>
-          <span>Runs locally on the NPU — file never leaves your laptop</span>
+          <strong>Process on this device (The Quiet Assistant)</strong>
+          <span>Runs locally on the NPU — confidential contract never leaves your laptop</span>
         </button>
 
         <button
@@ -433,12 +514,9 @@ function StreamNightView({
     )
     onProgress(nextResult.score)
 
-    const packet = challenge.packets.find((p) => p.id === packetId)
     onFeedback(
-      outcome.fellBack
-        ? `${packet?.label} isn't set up for the NPU here — fell back to ${outcome.engine}.`
-        : `${packet?.label} routed to ${engine}.`,
-      outcome.fellBack ? 'warn' : 'success',
+      getCharacterVoiceLine(engine, outcome.isGood),
+      outcome.isGood ? 'success' : 'warn',
     )
 
     if (Object.keys(next).length === challenge.packets.length) {
@@ -475,7 +553,9 @@ function StreamNightView({
                 <strong>{packet.label}</strong>
                 {picked && (
                   <span className={`web-task-badge ${picked.fellBack ? 'web-task-badge--warn' : 'web-task-badge--ok'}`}>
-                    {picked.fellBack ? `Fell back → ${packet.fallbackEngine}` : `Routed → ${picked.engine}`}
+                    {picked.fellBack
+                      ? `Fell back → ${packet.fallbackEngine}`
+                      : `Routed → ${ENGINE_CHARACTERS[picked.engine].name}`}
                   </span>
                 )}
               </div>
@@ -500,7 +580,60 @@ function StreamNightView({
   )
 }
 
-function BatteryEscapeView({
+interface BossTask {
+  id: string
+  packetId: string | null
+  title: string
+  hint: string
+  bestEngine: Engine
+}
+
+const DEADLINE_TASKS: BossTask[] = [
+  {
+    id: 'meeting-captions',
+    packetId: 'notes-summary-batch',
+    title: 'Meeting starts — live captions & notes',
+    hint: 'On-device speech/text AI',
+    bestEngine: 'NPU',
+  },
+  {
+    id: 'call-blur',
+    packetId: 'background-blur-batch',
+    title: 'Video call needs background blur',
+    hint: 'Continuous camera AI effect',
+    bestEngine: 'NPU',
+  },
+  {
+    id: 'file-compress',
+    packetId: 'browser-tabs',
+    title: 'Project file needs compressing',
+    hint: 'General file & tab workload',
+    bestEngine: 'CPU',
+  },
+  {
+    id: 'video-export',
+    packetId: 'video-export',
+    title: 'Client promo clip export',
+    hint: 'Heavy media rendering',
+    bestEngine: 'GPU',
+  },
+  {
+    id: 'report-recalc',
+    packetId: 'spreadsheet-recalc',
+    title: 'Report due — spreadsheet recalculation',
+    hint: 'Single-thread logic & formulas',
+    bestEngine: 'CPU',
+  },
+  {
+    id: 'final-summary',
+    packetId: null,
+    title: 'Executive recap before send',
+    hint: 'Quick on-device AI summary',
+    bestEngine: 'NPU',
+  },
+]
+
+function DeadlineDayBossView({
   challenge,
   elapsedMs,
   onRoute,
@@ -508,75 +641,98 @@ function BatteryEscapeView({
   onComplete,
   onFeedback,
 }: ChallengeProps) {
-  const [choices, setChoices] = useState<Record<string, BatteryEscapeChoice>>({})
+  const [visibleCount, setVisibleCount] = useState(2)
+  const [taskChoices, setTaskChoices] = useState<Record<string, Engine>>({})
+  const [packetChoices, setPacketChoices] = useState<Record<string, BatteryEscapeChoice>>({})
 
-  const result = scoreBatteryEscape(
-    { routes: choices, elapsedMs: elapsedMs() },
+  useEffect(() => {
+    if (visibleCount >= DEADLINE_TASKS.length) return
+    const timer = window.setInterval(() => {
+      setVisibleCount((c) => Math.min(DEADLINE_TASKS.length, c + 1))
+    }, 2200)
+    return () => window.clearInterval(timer)
+  }, [visibleCount])
+
+  const batteryResult = scoreBatteryEscape(
+    { routes: packetChoices, elapsedMs: elapsedMs() },
     challenge.packets,
     gameConfig.scoring,
   )
 
-  const handlePick = (packetId: string, engine: Engine) => {
-    if (choices[packetId]) return
-    const packet = challenge.packets.find((p) => p.id === packetId)
-    if (!packet) return
+  const handlePick = (task: BossTask, engine: Engine) => {
+    if (taskChoices[task.id]) return
+    const nextTasks = { ...taskChoices, [task.id]: engine }
+    setTaskChoices(nextTasks)
 
-    const outcome = onRoute(packetId, engine)
-    const choice: BatteryEscapeChoice = { engine, fellBack: outcome.fellBack }
-    const drain = batteryDrainFor(packet, choice, gameConfig.scoring)
-    const next = { ...choices, [packetId]: choice }
-    setChoices(next)
+    let nextPackets = packetChoices
+    let isGood = engine === task.bestEngine
 
-    const nextResult = scoreBatteryEscape(
-      { routes: next, elapsedMs: elapsedMs() },
+    if (task.packetId) {
+      const outcome = onRoute(task.packetId, engine)
+      nextPackets = {
+        ...packetChoices,
+        [task.packetId]: { engine, fellBack: outcome.fellBack },
+      }
+      setPacketChoices(nextPackets)
+      isGood = outcome.isGood
+    } else {
+      if (isGood) playGoodChime()
+      else playWarnHum()
+    }
+
+    const updated = scoreBatteryEscape(
+      { routes: nextPackets, elapsedMs: elapsedMs() },
       challenge.packets,
       gameConfig.scoring,
     )
-    onProgress(nextResult.score)
+    onProgress(updated.score)
+    onFeedback(
+      getCharacterVoiceLine(engine, isGood),
+      isGood ? 'success' : 'warn',
+    )
 
-    if (packet.npuBenefit === 'none' && engine === 'NPU') {
-      onFeedback('No NPU benefit for this task — meter unchanged.', 'neutral')
-    } else if (drain <= gameConfig.scoring.batteryEscape.gpuSuitableDrain) {
-      onFeedback(`${packet.label} routed efficiently — minimal drain.`, 'success')
-    } else {
-      onFeedback(`${packet.label} routed to ${engine}.`, 'success')
-    }
-
-    if (Object.keys(next).length === challenge.packets.length) {
-      onComplete(nextResult.score, nextResult.subscores)
+    if (Object.keys(nextTasks).length === DEADLINE_TASKS.length) {
+      onComplete(updated.score, updated.subscores)
     }
   }
 
   const batteryLabel =
-    result.remainingBattery >= 60 ? 'Steady' : result.remainingBattery >= 30 ? 'Dropping' : 'Low'
+    batteryResult.remainingBattery >= 60 ? 'Steady' : batteryResult.remainingBattery >= 30 ? 'Dropping' : 'Low'
   const batteryTone =
-    result.remainingBattery >= 60 ? 'success' : result.remainingBattery >= 30 ? 'info' : 'warn'
+    batteryResult.remainingBattery >= 60 ? 'success' : batteryResult.remainingBattery >= 30 ? 'info' : 'warn'
+
+  const arriving = DEADLINE_TASKS.slice(0, visibleCount)
 
   return (
     <div className="web-challenge-body">
       <div className="web-meter-box">
         <div className="web-meter-head">
-          <span>Illustrative battery meter (no hours/minutes shown)</span>
+          <span>
+            Deadline Day ({Object.keys(taskChoices).length}/{DEADLINE_TASKS.length} routed) · Illustrative battery
+          </span>
           <strong className={`web-tone-${batteryTone}`}>{batteryLabel}</strong>
         </div>
         <div className="web-meter-track">
           <div
             className={`web-meter-fill web-meter-fill--${batteryTone}`}
-            style={{ width: `${result.remainingBattery}%` }}
+            style={{ width: `${batteryResult.remainingBattery}%` }}
           />
         </div>
       </div>
 
       <div className="web-task-list">
-        {challenge.packets.map((packet) => {
-          const picked = choices[packet.id]
+        {arriving.map((task) => {
+          const picked = taskChoices[task.id]
           return (
-            <div key={packet.id} className="web-task-row">
+            <div key={task.id} className="web-task-row">
               <div className="web-task-info">
-                <strong>{packet.label}</strong>
+                <strong>{task.title}</strong>
+                <span className="web-task-sub">{task.hint}</span>
                 {picked && (
-                  <span className={`web-task-badge ${picked.fellBack ? 'web-task-badge--warn' : 'web-task-badge--ok'}`}>
-                    {picked.fellBack ? `Fell back → ${packet.fallbackEngine}` : `Routed → ${picked.engine}`}
+                  <span
+                    className={`web-task-badge ${picked === task.bestEngine ? 'web-task-badge--ok' : 'web-task-badge--warn'}`}
+                  >
+                    {ENGINE_CHARACTERS[picked].name}
                   </span>
                 )}
               </div>
@@ -586,8 +742,8 @@ function BatteryEscapeView({
                     key={engine}
                     type="button"
                     disabled={Boolean(picked)}
-                    className={`web-mini-engine ${picked?.engine === engine ? 'web-mini-engine--active' : ''}`}
-                    onClick={() => handlePick(packet.id, engine)}
+                    className={`web-mini-engine ${picked === engine ? 'web-mini-engine--active' : ''}`}
+                    onClick={() => handlePick(task, engine)}
                   >
                     {engine}
                   </button>
@@ -617,6 +773,8 @@ export default function WebGameStage({
   const [feedback, setFeedback] = useState('')
   const [feedbackTone, setFeedbackTone] = useState<'neutral' | 'success' | 'warn'>('neutral')
   const [doneMessage, setDoneMessage] = useState<string | null>(null)
+  const [routedCount, setRoutedCount] = useState(0)
+  const [fallbackCount, setFallbackCount] = useState(0)
   const startTimeRef = useRef<number>(Date.now())
   const localRoutesRef = useRef<Record<string, PacketRoute>>({})
 
@@ -624,8 +782,14 @@ export default function WebGameStage({
     startTimeRef.current = Date.now()
     localRoutesRef.current = {}
     setDoneMessage(null)
+    setRoutedCount(0)
+    setFallbackCount(0)
     if (challenge) {
-      setFeedback(challenge.objective)
+      setFeedback(
+        challenge.id === 'battery-escape'
+          ? 'Deadline Day! Route all 6 arriving tasks before time runs out.'
+          : challenge.objective,
+      )
       setFeedbackTone('neutral')
     }
   }, [phase, currentChallenge, challenge?.id])
@@ -649,14 +813,25 @@ export default function WebGameStage({
   }
 
   const handleRoute = (packetId: string, engine: Engine) => {
-    if (!challenge) return { engine, fellBack: false }
+    if (!challenge) return { engine, fellBack: false, isGood: true }
     const packet = getChallenge(challenge.id).packets.find((p) => p.id === packetId)
-    if (!packet) return { engine, fellBack: false }
+    if (!packet) return { engine, fellBack: false, isGood: true }
 
     const outcome = resolveRoute(packet, engine, gameConfig.race)
+    const isGood = routeIsCorrect(packet, outcome.engine, outcome.fellBack)
     localRoutesRef.current[packet.id] = {
       routedTo: outcome.engine,
       fellBack: outcome.fellBack,
+    }
+    setRoutedCount((c) => c + 1)
+    if (outcome.fellBack) {
+      setFallbackCount((c) => c + 1)
+    }
+
+    if (isGood) {
+      playGoodChime()
+    } else {
+      playWarnHum()
     }
 
     gameBus.emit('packet:routed', {
@@ -674,13 +849,10 @@ export default function WebGameStage({
         to: packet.fallbackEngine,
         captionKey: 'fallback',
       })
-      if (outcome.caption) {
-        gameBus.emit('game:caption', { text: outcome.caption, durationMs: 2500 })
-      }
     }
 
     publishRace()
-    return { engine: outcome.engine, fellBack: outcome.fellBack }
+    return { engine: outcome.engine, fellBack: outcome.fellBack, isGood }
   }
 
   const handleProgress = (score: number) => {
@@ -690,6 +862,7 @@ export default function WebGameStage({
 
   const handleComplete = (score: number, subscores?: Record<string, number>) => {
     if (!challenge) return
+    playCompleteChord()
     const elapsed = Math.min(challenge.timeLimitMs, Date.now() - startTimeRef.current)
     gameBus.emit('challenge:complete', {
       challengeId: challenge.id,
@@ -708,14 +881,14 @@ export default function WebGameStage({
       <section className="web-stage-card" aria-label="Race setup">
         <div className="web-setup-grid">
           <div className="web-setup-lane web-setup-lane--left">
-            <span className="web-setup-badge web-setup-badge--left">WITHOUT NPU ROUTING</span>
-            <h3>CPU or GPU only</h3>
-            <p>Every AI and graphics task queues on general-purpose engines.</p>
+            <span className="web-setup-badge web-setup-badge--left">GHOST LAPTOP · NO NPU</span>
+            <h3>CPU &amp; GPU carry everything</h3>
+            <p>AI blur, summaries, and background tasks pile up on general-purpose processors.</p>
           </div>
           <div className="web-setup-lane web-setup-lane--right">
-            <span className="web-setup-badge web-setup-badge--right">WITH NPU ROUTING</span>
-            <h3>Smart engine routing</h3>
-            <p>Supported AI tasks run on the dedicated NPU, keeping CPU &amp; GPU free.</p>
+            <span className="web-setup-badge web-setup-badge--right">AI PC · 3 SPECIALISTS</span>
+            <h3>The Generalist, The Heavy Lifter &amp; The Quiet Assistant</h3>
+            <p>Route each task to the right character to keep frames smooth and power low.</p>
           </div>
         </div>
         <div className="web-stage-actions">
@@ -731,9 +904,9 @@ export default function WebGameStage({
   if (phase === 'race-finish') {
     const winner =
       race.rightProgress > race.leftProgress
-        ? 'With NPU routing finished ahead!'
+        ? 'AI PC (with The Quiet Assistant) finished ahead!'
         : race.leftProgress > race.rightProgress
-          ? 'Without NPU routing finished ahead.'
+          ? 'Ghost Laptop finished ahead.'
           : 'Both lanes finished level.'
 
     return (
@@ -742,12 +915,13 @@ export default function WebGameStage({
           <Cpu size={28} aria-hidden="true" />
           <div>
             <h2>{winner}</h2>
-            <p>Your routing choices shaped both the race and your AI PC profile.</p>
+            <p>Your routing choices shaped your AI PC Week plan and collectible trading card.</p>
           </div>
         </div>
+        <LiveOnDeviceDemo />
         <div className="web-stage-actions">
           <button type="button" className="primary-button" onClick={onAdvance}>
-            SEE YOUR AI PC IDENTITY
+            REVEAL COLLECTIBLE CARD
             <ArrowRight size={20} aria-hidden="true" />
           </button>
         </div>
@@ -779,11 +953,17 @@ export default function WebGameStage({
         {feedback}
       </div>
 
-      {challenge.id === 'study-sprint' && <StudySprintView {...props} />}
-      {challenge.id === 'creator-mode' && <CreatorModeView {...props} />}
-      {challenge.id === 'privacy-shield' && <PrivacyShieldView {...props} />}
-      {challenge.id === 'stream-night' && <StreamNightView {...props} />}
-      {challenge.id === 'battery-escape' && <BatteryEscapeView {...props} />}
+      <div className="web-split-stage">
+        <div className="web-split-main">
+          {challenge.id === 'study-sprint' && <StudySprintView {...props} />}
+          {challenge.id === 'creator-mode' && <CreatorModeView {...props} />}
+          {challenge.id === 'privacy-shield' && <PrivacyShieldView {...props} />}
+          {challenge.id === 'stream-night' && <StreamNightView {...props} />}
+          {challenge.id === 'battery-escape' && <DeadlineDayBossView {...props} />}
+        </div>
+
+        <GhostLaptopPanel routedCount={routedCount} fallbacks={fallbackCount} />
+      </div>
 
       {isCompleted && (
         <div className="web-stage-actions">
@@ -796,4 +976,3 @@ export default function WebGameStage({
     </section>
   )
 }
-

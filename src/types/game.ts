@@ -242,4 +242,6 @@ export interface GameState {
   recommendedModelCodes: string[]
   storeReady: boolean
   handoffPending: boolean
+  selectedBundle?: string | null
+  maxBudget?: number
 }

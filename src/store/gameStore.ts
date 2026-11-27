@@ -59,6 +59,8 @@ const createInitialState = (): GameState => ({
   recommendedModelCodes: [],
   storeReady: false,
   handoffPending: false,
+  selectedBundle: null,
+  maxBudget: 150000,
 })
 
 const skippedSet = (statuses: Record<ChallengeId, ChallengeStatus>): Set<ChallengeId> =>
@@ -79,6 +81,7 @@ interface GameActions {
   finishSession: () => void
   finalizeSession: () => void
   setHandoffPending: (pending: boolean) => void
+  setShopperPreferences: (prefs: { selectedBundle?: string | null; maxBudget?: number }) => void
   resetChallengeRoutes: (challengeId: ChallengeId) => void
   routePacket: (
     challengeId: ChallengeId,
@@ -148,6 +151,12 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     })
   },
   setHandoffPending: (pending) => set({ handoffPending: pending }),
+  setShopperPreferences: (prefs) =>
+    set((state) => ({
+      selectedBundle:
+        prefs.selectedBundle !== undefined ? prefs.selectedBundle : state.selectedBundle,
+      maxBudget: prefs.maxBudget !== undefined ? prefs.maxBudget : state.maxBudget,
+    })),
   resetChallengeRoutes: (challengeId) =>
     set((state) => {
       const challenge = gameConfig.challenges.find((item) => item.id === challengeId)
