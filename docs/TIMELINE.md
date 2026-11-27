@@ -17,8 +17,7 @@ The landing screen is a pre-session screen. START creates a local-only session i
 | 80 | 105 | 25 | Stream Night | 3 |
 | 105 | 130 | 25 | Battery Escape | 3 |
 | 130 | 140 | 10 | Race finish | 2 |
-| 140 | 152 | 12 | Persona reveal | 4 |
-| 152 | 165 | 13 | Store picks or fallback | 4 |
+| 140 | 165 | 25 | Store picks or fallback | 4 |
 | 165 | 175 | 10 | Value and fit | 4 |
 | 175 | 180 | 5 | Next-step bar | 4 |
 

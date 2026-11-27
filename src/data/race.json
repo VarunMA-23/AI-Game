@@ -34,8 +34,7 @@
     { "startMs": 80000, "endMs": 105000, "phase": "challenges", "challengeIndex": 4 },
     { "startMs": 105000, "endMs": 130000, "phase": "challenges", "challengeIndex": 5 },
     { "startMs": 130000, "endMs": 140000, "phase": "race-finish", "challengeIndex": 0 },
-    { "startMs": 140000, "endMs": 152000, "phase": "persona", "challengeIndex": 0 },
-    { "startMs": 152000, "endMs": 165000, "phase": "store", "challengeIndex": 0 },
+    { "startMs": 140000, "endMs": 165000, "phase": "store", "challengeIndex": 0 },
     { "startMs": 165000, "endMs": 175000, "phase": "value", "challengeIndex": 0 },
     { "startMs": 175000, "endMs": 180000, "phase": "next-step", "challengeIndex": 0 }
   ]

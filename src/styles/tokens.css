@@ -10,6 +10,15 @@
   --color-muted: #475569;
   --color-success: #15803d;
   --color-rival: #e11d48;
+  --color-lime: #d4ff54;
+  --color-lime-soft: rgba(212, 255, 84, 0.18);
+  --color-indigo-soft: rgba(124, 58, 237, 0.14);
+  --color-sky-soft: rgba(56, 189, 248, 0.12);
+  --color-ink: #0f172a;
+  --gradient-page: radial-gradient(circle at 12% 8%, var(--color-indigo-soft), transparent 32%),
+    radial-gradient(circle at 88% 18%, var(--color-sky-soft), transparent 30%),
+    radial-gradient(circle at 50% 100%, var(--color-lime-soft), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #f4f7fc 100%);
   --border-soft: #e2e8f0;
   --border-strong: #cbd5e1;
   --shadow-lane: 0 10px 30px rgba(15, 23, 42, 0.06);

@@ -11,17 +11,25 @@ interface EndingFrameProps {
 export default function EndingFrame({ kicker, title, children, footer }: EndingFrameProps) {
   return (
     <main className="ending-screen">
-      <section className="ending-card" aria-labelledby="ending-title">
-        <header className="ending-header">
+      <div className="ending-shell">
+        <header className="ending-topbar">
           <BrandMark />
-          <p className="ending-kicker">{kicker}</p>
+          <p className="ending-topbar-note">Offline retail demo · 180-second session</p>
         </header>
-        <h1 id="ending-title" className="ending-title">
-          {title}
-        </h1>
-        <div className="ending-body">{children}</div>
-        {footer ? <footer className="ending-footer">{footer}</footer> : null}
-      </section>
+        <section className="ending-card" aria-labelledby="ending-title">
+          <header className="ending-header">
+            <div className="ending-kicker-row">
+              <span className="ending-square" aria-hidden="true" />
+              <p className="ending-kicker">{kicker}</p>
+            </div>
+            <h1 id="ending-title" className="ending-title">
+              {title}
+            </h1>
+          </header>
+          <div className="ending-body">{children}</div>
+          {footer ? <footer className="ending-footer">{footer}</footer> : null}
+        </section>
+      </div>
     </main>
   )
 }

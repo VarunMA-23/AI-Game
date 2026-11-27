@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       injectRegister: null,
       includeAssets: ['favicon.svg'],
       manifest: {
@@ -36,6 +36,7 @@ export default defineConfig({
         globIgnores: ['game/**'],
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/game\//],
       },
     }),
     {

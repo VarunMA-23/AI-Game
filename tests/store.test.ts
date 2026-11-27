@@ -83,11 +83,11 @@ describe('game store event reduction', () => {
     expect(state.challengeScores['study-sprint']).toBe(0)
   })
 
-  it('finalizes into the persona reveal with a safe store fallback', () => {
+  it('finalizes into store picks with a safe store fallback', () => {
     useGameStore.getState().startSession()
     useGameStore.getState().finalizeSession()
     const state = useGameStore.getState()
-    expect(state.phase).toBe('persona')
+    expect(state.phase).toBe('store')
     expect(state.persona).not.toBeNull()
     expect(state.completedAt).not.toBeNull()
     expect(state.storeReady).toBe(false)

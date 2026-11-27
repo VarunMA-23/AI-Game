@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
-import { Check, Download, Lock, MessageSquareText, RotateCcw, Save } from 'lucide-react'
+import { Download, Lock, MessageSquareText, RotateCcw, Save } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import EndingFrame from '../../components/common/EndingFrame'
 import { useRequireSession } from '../challenges/useRequireSession'
@@ -15,6 +15,14 @@ import { addHandoff } from '../../services/storage/handoffStorage'
 import { recordEndingAction } from '../../services/storage/measurementStorage'
 import { useGameStore } from '../../store/gameStore'
 import { useIdleReset } from '../onboarding/useIdleReset'
+
+const CHECKLIST = [
+  'Which processor family and exact model is it?',
+  'Does it have an NPU, and which AI features do the apps I use support?',
+  'How much RAM, and can it be upgraded?',
+  "What's the battery capacity, and does the manufacturer publish a battery-life test?",
+  "What's the warranty and return policy?",
+]
 
 export default function NextStepScreen() {
   const navigate = useNavigate()
@@ -40,7 +48,6 @@ export default function NextStepScreen() {
   const cardMeta = buildCollectibleCard(persona, scores, summary.total)
   const [qrImage, setQrImage] = useState('')
   const [cardImages, setCardImages] = useState<PersonaCardImages | null>(null)
-  const [remindOptIn, setRemindOptIn] = useState(false)
 
   useIdleReset(45000)
 
@@ -79,7 +86,7 @@ export default function NextStepScreen() {
       QRCode.toDataURL(payload, {
         margin: 1,
         width: 420,
-        color: { dark: '#111827', light: '#FFFFFF' },
+        color: { dark: '#0f172a', light: '#FFFFFF' },
       }),
       renderPersonaCard({
         storeName: inventory.storeName,
@@ -106,24 +113,31 @@ export default function NextStepScreen() {
   return (
     <EndingFrame
       kicker="Your next step"
-      title="TAKE THE NEXT STEP."
+      title="Take the next step."
       footer={
         <span className="ending-progress">
           {handoffPending
-            ? `A specialist has your ${cardMeta.title} card & ${selectedBundle ?? 'store'} preferences.`
+            ? `A specialist has your ${cardMeta.title} card and ${selectedBundle ?? 'store'} preferences.`
             : 'No personal details are collected.'}
         </span>
       }
     >
-      <div className="privacy-closing-hook">
-        <Lock size={22} aria-hidden="true" />
-        <div>
-          <strong>What leaves your device? With on-device AI, your files stay yours.</strong>
-          <p>
-            Compatible apps run summaries, blur, and creative edits locally on the NPU — no cloud upload required.
-          </p>
+      <section className="plan-container design-reveal">
+        <p className="plan-lead">
+          Ask a specialist about the exact configuration, then save a QR plan to compare later.
+          Nothing here identifies you.
+        </p>
+        <div className="privacy-closing-hook">
+          <Lock size={22} aria-hidden="true" />
+          <div>
+            <strong className="card-title">Keep the file on the device?</strong>
+            <p className="body-text">
+              Compatible apps can run summaries, blur and edits on the device. Privacy still depends
+              on the app and its settings.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div className="next-step-actions">
         <button
@@ -132,35 +146,16 @@ export default function NextStepScreen() {
           onClick={handleSpecialist}
           disabled={!persona || handoffPending}
         >
-          {handoffPending ? 'SPECIALIST HAS YOUR CONTEXT' : 'ASK A SPECIALIST'}
+          {handoffPending ? 'Specialist has your context' : 'Ask a specialist'}
           <MessageSquareText size={24} aria-hidden="true" />
         </button>
         <button type="button" className="secondary-button" onClick={handleSave} disabled={!persona}>
-          SAVE &amp; REMIND (QR)
-          <Save size={22} aria-hidden="true" />
+          Save your picks <Save size={22} aria-hidden="true" />
         </button>
         <button type="button" className="text-button" onClick={handlePlayAgain}>
-          PLAY AGAIN
-          <RotateCcw size={20} aria-hidden="true" />
+          Play again <RotateCcw size={20} aria-hidden="true" />
         </button>
       </div>
-
-      <label className="remind-optin">
-        <input
-          type="checkbox"
-          checked={remindOptIn}
-          onChange={(e) => setRemindOptIn(e.target.checked)}
-        />
-        <span>
-          {remindOptIn ? (
-            <>
-              <Check size={15} aria-hidden="true" /> Your plan is ready when you are — scan the QR below to keep it on your phone.
-            </>
-          ) : (
-            'Opt in to save a low-pressure reminder with your QR plan (no email or phone number needed).'
-          )}
-        </span>
-      </label>
 
       {qrImage || cardImages ? (
         <div className="saved-picks">
@@ -173,11 +168,10 @@ export default function NextStepScreen() {
           {cardImages ? (
             <>
               <figure>
-                <img src={cardImages.front} alt="Front of your collectible persona trading card" />
+                <img src={cardImages.front} alt="Front of your collectible persona card" />
                 <figcaption>
                   <a href={cardImages.front} download="ai-pc-persona-card-front.png">
-                    SAVE CARD FRONT
-                    <Download size={18} aria-hidden="true" />
+                    Save card front <Download size={18} aria-hidden="true" />
                   </a>
                 </figcaption>
               </figure>
@@ -185,18 +179,32 @@ export default function NextStepScreen() {
                 <img src={cardImages.back} alt="Back of your persona card with shopper checklist" />
                 <figcaption>
                   <a href={cardImages.back} download="ai-pc-persona-card-back.png">
-                    SAVE CHECKLIST BACK
-                    <Download size={18} aria-hidden="true" />
+                    Save checklist back <Download size={18} aria-hidden="true" />
                   </a>
                 </figcaption>
               </figure>
             </>
           ) : null}
-          <p className="disclosure">
-            No name, photo, session ID or timestamp is stored on the card.
-          </p>
+          <p className="disclosure">No name, photo, session ID or timestamp is stored on the card.</p>
         </div>
       ) : null}
+
+      <section className="value-section" aria-labelledby="next-checklist-title">
+        <h2 id="next-checklist-title" className="section-heading">
+          Shopper checklist
+        </h2>
+        <ol className="checklist">
+          {CHECKLIST.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </section>
+
+      <footer className="source-footer">
+        <p className="caption-text">
+          Compare the exact configuration, software support, warranty and price before you decide.
+        </p>
+      </footer>
     </EndingFrame>
   )
 }

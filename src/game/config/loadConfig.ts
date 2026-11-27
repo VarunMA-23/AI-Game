@@ -35,7 +35,6 @@ const isPhase = (value: unknown): value is Phase =>
   value === 'setup' ||
   value === 'challenges' ||
   value === 'race-finish' ||
-  value === 'persona' ||
   value === 'store' ||
   value === 'value' ||
   value === 'next-step' ||

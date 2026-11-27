@@ -3,7 +3,6 @@ export type Phase =
   | 'setup'
   | 'challenges'
   | 'race-finish'
-  | 'persona'
   | 'store'
   | 'value'
   | 'next-step'

@@ -1,6 +1,6 @@
 # AI PC Showdown
 
-Find the AI PC that fits how you actually work, in under 3 minutes. We show you which tasks an NPU handles so your laptop stays cool, quiet, and private, then recommend in-stock models that match your budget and daily routine.
+Find the AI PC that fits how you actually work, in under 3 minutes. We show you which tasks an NPU can handle in supported apps, then recommend in-stock models that match your budget and daily routine.
 
 Instead of reading a spec sheet, you route real everyday tasks—studying, photo editing, confidential contracts, live streaming, and a **Deadline Day** rush—across **The Generalist (CPU)**, **The Heavy Lifter (GPU)**, and **The Quiet Assistant (NPU)** while watching a split-screen **Ghost Laptop** without an NPU struggle to keep up. At the end, you get a personalized **"Your AI PC Week"** plan, a collectible trading card, live **offline** on-device AI proof, and real in-stock store picks filtered by your use-case track and budget.
 
@@ -16,7 +16,7 @@ Instead of reading a spec sheet, you route real everyday tasks—studying, photo
 - **Split-Screen Ghost Laptop** — Side-by-side comparison showing how a standard non-NPU laptop's fan noise, power headroom, and task queue respond, paired with cited Intel Core Ultra & store inventory specs (`11–47 NPU TOPS`, `64–76 Wh` battery).
 - **Collectible Persona Trading Card** — Rarity tier (`Standard` to `Legendary`), one-line title (e.g., *“Midnight Deadline Runner”*), and 4-stat block (`Focus`, `Creativity`, `Privacy`, `Battery Care`) exportable as PNG + QR code.
 - **Your AI PC Week** — Personal plan built from your actual challenge choices, showing which tasks move to the NPU, estimated weekly hours offloaded, cited hardware specs, and explicit assumptions.
-- **Use-Case Bundles, Budget Slider & Warm Handoff** — Filter real store picks (`stores/DEL01/inventory.json`) across **Student**, **Remote Worker**, **Creator**, and **Streamer** tracks with a live ₹55,000–₹1,50,000 budget slider, and pass full context to the in-store **Staff Panel**.
+- **Use-Case Bundles, Budget Slider & Warm Handoff** — Filter real store picks (`stores/LFR01/inventory.json`, sourced from Reliance Digital, Croma and Vijay Sales) across **Student**, **Remote Worker**, **Creator**, and **Streamer** tracks with a live ₹55,000–₹1,50,000 budget slider, and pass full context to the in-store **Staff Panel**.
 
 ---
 

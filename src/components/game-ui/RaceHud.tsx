@@ -73,12 +73,12 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
   const multiplier = combo >= 5 ? '3x' : combo >= 3 ? '2x' : combo >= 2 ? '1.5x' : null
 
   const title = challenge
-    ? challenge.id === 'battery-escape'
-      ? 'DEADLINE DAY — BOSS BATTLE'
-      : challenge.title.toUpperCase()
+        ? challenge.id === 'battery-escape'
+          ? 'Deadline Day — boss battle'
+          : challenge.title
     : phase === 'setup'
-      ? 'MEET YOUR 3 ENGINES'
-      : 'RACE FINISH'
+      ? 'Meet your 3 engines'
+      : 'Race finish'
 
   const scenario = challenge
     ? challenge.id === 'battery-escape'
@@ -92,7 +92,7 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
         <BrandMark />
         <div className="hud-copy">
           <span className="hud-kicker">
-            {challenge ? `CHALLENGE ${currentChallenge} / 5` : 'THE ROUTING RACE'}
+            {challenge ? `Challenge ${currentChallenge} / 5` : 'The routing race'}
           </span>
           <h1 className="hud-title">{title}</h1>
           <p className="hud-scenario">{scenario}</p>
@@ -141,7 +141,7 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
 
       <div className="hud-lanes" aria-label="Race progress">
         <div className="hud-lane hud-lane--left">
-          <span className="hud-lane-label">GHOST LAPTOP (NO NPU)</span>
+          <span className="hud-lane-label">Without NPU routing</span>
           <div className={`hud-lane-track ${ghostFlash ? 'hud-lane-track--flash' : ''}`}>
             <div
               className="hud-lane-fill"
@@ -157,7 +157,7 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
           </div>
         </div>
         <div className="hud-lane hud-lane--right">
-          <span className="hud-lane-label">AI PC (WITH NPU)</span>
+          <span className="hud-lane-label">With NPU routing</span>
           <div className="hud-lane-track">
             <div
               className="hud-lane-fill"

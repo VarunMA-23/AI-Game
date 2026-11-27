@@ -10,11 +10,9 @@ import { useSessionTimeline } from './useSessionTimeline'
 const guidedPhases: Phase[] = ['setup', 'challenges', 'race-finish']
 
 const endingRoutes: Record<string, string> = {
-  persona: '/persona',
   store: '/store',
   value: '/value',
   'next-step': '/next-step',
-  staff: '/staff',
 }
 
 export default function GameScreen() {

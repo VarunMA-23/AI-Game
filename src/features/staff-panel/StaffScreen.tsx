@@ -49,7 +49,7 @@ export default function StaffScreen({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <EndingFrame kicker="Staff" title="KIOSK PANEL.">
+    <EndingFrame kicker="Staff" title="Kiosk panel.">
       {!unlocked ? (
         <div className="staff-login">
           <label htmlFor="staff-pin">Store PIN</label>
@@ -61,10 +61,10 @@ export default function StaffScreen({ onClose }: { onClose: () => void }) {
             onChange={(event) => setPin(event.target.value)}
           />
           <button type="button" className="secondary-button" onClick={handleUnlock}>
-            OPEN PANEL
+            Open panel
           </button>
           <button type="button" className="text-button" onClick={onClose}>
-            CLOSE
+            Close
           </button>
         </div>
       ) : (
@@ -104,7 +104,7 @@ export default function StaffScreen({ onClose }: { onClose: () => void }) {
                     onClick={() => handleConfirm(handoff.createdAt)}
                   >
                     <CheckCircle2 size={18} aria-hidden="true" />
-                    CONFIRM
+                    Confirm
                   </button>
                 </article>
               ))
@@ -123,11 +123,11 @@ export default function StaffScreen({ onClose }: { onClose: () => void }) {
             <h2>Kiosk controls</h2>
             <p>Mode: {mode}</p>
             <button type="button" className="secondary-button" onClick={handleReset}>
-              RESET SESSION
+              Reset session
               <RotateCcw size={20} aria-hidden="true" />
             </button>
             <button type="button" className="small-button" onClick={handleExit}>
-              EXIT KIOSK
+              Exit kiosk
               <LogOut size={18} aria-hidden="true" />
             </button>
             {exitMessage ? <p>{exitMessage}</p> : null}

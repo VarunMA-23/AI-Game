@@ -57,7 +57,7 @@ flowchart TB
 | Layer | Location from spec | Responsibility | Must not do |
 |---|---|---|---|
 | App shell | `src/app/` | Hash routing, providers, phase-driven screen selection, single Phaser mount | Own race/scoring rules |
-| React screens | `src/features/`, `src/components/` | Landing, persona reveal, store picks, value/fit, next-step, staff panel, checklist | Import Phaser scenes into screen logic |
+| React screens | `src/features/`, `src/components/` | Landing, store picks, value/fit, next-step, staff panel, checklist | Import Phaser scenes into screen logic |
 | Shared state | `src/store/` | `GameState`, actions, phase transitions, event reduction | Contain derived product/scoring logic |
 | Game engine | `src/game/scenes/` | Boot, setup, five challenges, race finish, timers, tweens, particles | Write React state directly |
 | Game contracts | `src/game/events/` | Typed event names and payloads shared by Phaser and React | Import React or Phaser types into pure logic |
@@ -89,7 +89,7 @@ The Zustand store is the single source of truth. The spec-defined `GameState` fi
 | `caption` | Latest transient HUD caption | `game:caption` | React HUD |
 | `packetRoutes` | Final route and fallback flag per packet | `packet:routed`, `packet:fallback` | Race, scoring, staff/debug |
 | `race` | Left/right progress | `race:update` | Race HUD, finish |
-| `persona` | Result of weighted persona engine | Persona engine | Reveal, ranking |
+| `persona` | Result of weighted persona engine | Persona engine | Store ranking, value fit |
 | `recommendedModelCodes` | Top/value/alternative codes | Ranking + gate | Store picks, QR |
 | `storeReady` | Readiness gate result | Gate logic | Staff panel, store screen |
 | `handoffPending` | Whether a specialist handoff exists | Handoff service | Next-step, staff panel |

@@ -1,38 +1,31 @@
-import type { ChallengeId, PacketRoute, PersonaId } from '../../types/game'
+import type { PacketRoute, PersonaId } from '../../types/game'
 
 export interface WeeklyTaskEstimate {
   task: string
   engine: string
   playerChoiceNote: string
-  estimatedHoursPerWeek: string
   specCitation: string
 }
 
 export interface WeeklyReport {
   personaHeadline: string
   tasks: WeeklyTaskEstimate[]
-  totalEstimatedHoursOffloaded: number
-  estimatedBatteryGainPct: string
+  batteryNote: string
   citedSpecs: Array<{ label: string; value: string; source: string }>
   assumptions: string[]
 }
 
 const HEADLINES: Record<PersonaId, string> = {
-  THE_LEARNER: 'Built for study sprints, lecture notes, and all-day campus battery.',
-  THE_CREATOR: 'Built for layered photo/video edits without waking high-wattage cores.',
-  THE_POWER_USER: 'Built for confidential local docs, multitasking, and quiet calls.',
-  THE_GAMER: 'Built to keep GPU frames locked while the NPU handles call blur.',
+  THE_LEARNER: 'A study plan built around note summaries, local processing and portable specs.',
+  THE_CREATOR: 'A creative plan built around memory, storage, display and supported effects.',
+  THE_POWER_USER: 'A multitasking plan built around memory, local processing and battery capacity.',
+  THE_GAMER: 'A gaming plan built around the GPU, memory and display.',
 }
 
 export const buildWeeklyReport = (
   packetRoutes: Record<string, PacketRoute>,
   persona: PersonaId | null = null,
-  challengeScores: Partial<Record<ChallengeId, number>> = {},
 ): WeeklyReport => {
-  const npuCount = Object.values(packetRoutes).filter(
-    (r) => r.routedTo === 'NPU' && !r.fellBack,
-  ).length
-
   const notesRoute = packetRoutes['notes-summary']
   const bgRoute = packetRoutes['background-removal']
   const privacyRoute = packetRoutes['confidential-document']
@@ -40,66 +33,60 @@ export const buildWeeklyReport = (
 
   const tasks: WeeklyTaskEstimate[] = [
     {
-      task: 'Video call background blur & noise removal',
-      engine: 'NPU (The Quiet Assistant)',
+      task: 'Video call blur and noise removal',
+      engine: blurRoute?.routedTo === 'NPU' && !blurRoute.fellBack ? 'NPU' : 'CPU or GPU',
       playerChoiceNote: blurRoute
-        ? `You routed this to ${blurRoute.routedTo}${blurRoute.fellBack ? ' (fell back)' : ''}.`
-        : 'Recommended for NPU offload in compatible call apps.',
-      estimatedHoursPerWeek: `${(challengeScores['stream-night'] ?? 0) >= 120 ? '7–9' : '5–7'} hrs/week (estimate)`,
-      specCitation: '11–47 NPU TOPS (Intel Core Ultra Spec)',
+        ? `You routed this to ${blurRoute.routedTo}${blurRoute.fellBack ? ' and saw a fallback' : ''}.`
+        : 'Route it to the NPU only when the call app supports that effect.',
+      specCitation: 'App support must be checked on the store unit.',
     },
     {
-      task: 'Local lecture & contract summaries',
-      engine: 'NPU (The Quiet Assistant)',
+      task: 'Local document and note summaries',
+      engine: privacyRoute?.routedTo === 'NPU' || notesRoute?.routedTo === 'NPU' ? 'NPU' : 'CPU',
       playerChoiceNote:
         privacyRoute?.routedTo === 'NPU' || notesRoute?.routedTo === 'NPU'
-          ? 'You kept this on-device (0 bytes uploaded).'
-          : 'Moving this to the NPU keeps confidential files on-device.',
-      estimatedHoursPerWeek: `${(challengeScores['privacy-shield'] ?? 0) >= 120 ? '4–5' : '2–3'} hrs/week (estimate)`,
-      specCitation: '17W–28W Processor Base Power (Intel Ark 258V / 125H)',
+          ? 'In the demo, that file stayed on this device.'
+          : 'Local processing keeps the file on the device; check the app settings.',
+      specCitation: 'Privacy depends on the app and its settings.',
     },
     {
-      task: 'AI photo background removal & batch effects',
-      engine: bgRoute?.routedTo === 'NPU' ? 'NPU (The Quiet Assistant)' : 'NPU + Arc GPU',
+      task: 'Photo background removal',
+      engine: bgRoute?.routedTo === 'NPU' && !bgRoute.fellBack ? 'NPU' : 'GPU',
       playerChoiceNote: bgRoute
         ? `You routed background removal to ${bgRoute.routedTo}.`
-        : 'Offloads routine masking from the GPU.',
-      estimatedHoursPerWeek: `${(challengeScores['creator-mode'] ?? 0) >= 120 ? '3–4' : '1.5–2.5'} hrs/week (estimate)`,
-      specCitation: '64–76 Wh battery capacity (DEL01 Verified Inventory)',
+        : 'Some creative effects run on the GPU, even on an AI PC.',
+      specCitation: 'RAM and storage matter when several apps are open.',
     },
   ]
-
-  const baseHours = 6 + Math.min(8, npuCount * 1.5)
-  const batteryGain = npuCount >= 3 ? '12%–18% (estimate)' : '8%–12% (estimate)'
 
   return {
     personaHeadline: persona
       ? HEADLINES[persona]
-      : 'Personalized from your routing choices across all 5 challenges.',
+      : 'A plan built from your routing choices across the challenges.',
     tasks,
-    totalEstimatedHoursOffloaded: Math.round(baseHours),
-    estimatedBatteryGainPct: batteryGain,
+    batteryNote:
+      'Routing supported tasks to the NPU can reduce power use. Real battery life depends on the laptop, screen, software and workload.',
     citedSpecs: [
       {
-        label: 'NPU Compute',
-        value: '11–47 TOPS (Intel AI Boost)',
-        source: 'Source: Intel Core Ultra Specifications',
+        label: 'NPU availability',
+        value: 'Intel Core Ultra models in this store inventory',
+        source: 'Store inventory, verified 27 Nov 2026',
       },
       {
-        label: 'Battery Capacity',
-        value: '64–76 Wh across DEL01 lineup',
-        source: 'Source: DEL01 Verified Store Inventory (2026-11-20)',
+        label: 'Battery capacity',
+        value: 'Shown in Wh where the manufacturer publishes it',
+        source: 'Store inventory, verified 27 Nov 2026',
       },
       {
-        label: 'Processor Base Power',
-        value: '17W (Core Ultra 7 258V) / 28W (Core Ultra 5 125H)',
-        source: 'Source: Intel ARK Product Specifications',
+        label: 'App support',
+        value: 'Not assumed; ask our team',
+        source: 'Store inventory',
       },
     ],
     assumptions: [
-      'Assumes ~1.5 hours/day of video calls in NPU-compatible apps (Zoom, Microsoft Teams, Windows Studio Effects).',
-      'Assumes 4–6 local document summary or photo-mask runs per week in supported apps.',
-      'Secondary note: weekly hours and battery percentages are estimates; NPU TOPS, Wh, and TDP are published vendor specs.',
+      'Each task uses the NPU only when the app supports it.',
+      'The race is an illustrative routing simulation, not a benchmark.',
+      'Compare the exact configuration, software support, warranty and price before you decide.',
     ],
   }
 }

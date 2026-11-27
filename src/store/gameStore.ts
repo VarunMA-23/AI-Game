@@ -149,7 +149,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
 
       return {
         completedAt: state.completedAt ?? Date.now(),
-        phase: 'persona',
+        phase: 'store',
         persona: personaResult.persona,
         recommendedModelCodes,
         storeReady: readiness.ready,
