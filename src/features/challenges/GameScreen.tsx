@@ -22,14 +22,19 @@ export default function GameScreen() {
   const advance = useSessionTimeline()
 
   const phase = useGameStore((state) => state.phase)
+  const startSession = useGameStore((state) => state.startSession)
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (phase === 'landing') {
+      startSession()
+      return
+    }
     if (guidedPhases.includes(phase)) {
       return
     }
     navigate(endingRoutes[phase] ?? '/', { replace: true })
-  }, [navigate, phase])
+  }, [navigate, phase, startSession])
 
   if (!guidedPhases.includes(phase)) {
     return <main className="session-complete" aria-live="polite" />
