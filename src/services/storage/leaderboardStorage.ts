@@ -91,3 +91,4 @@ export const recordLeaderboardScore = (
   getStorage()?.setItem(`${STORAGE_KEY}.${storeId}`, JSON.stringify(next))
   return next
 }
+

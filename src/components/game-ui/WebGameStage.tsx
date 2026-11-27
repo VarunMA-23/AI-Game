@@ -798,6 +798,21 @@ export default function WebGameStage({
   const [doneMessage, setDoneMessage] = useState<string | null>(null)
   const [routedCount, setRoutedCount] = useState(0)
   const [fallbackCount, setFallbackCount] = useState(0)
+  const [leaderboardRecorded, setLeaderboardRecorded] = useState(false)
+
+  useEffect(() => {
+    if (phase !== 'race-finish' || leaderboardRecorded) return
+    const state = useGameStore.getState()
+    const total = Object.values(state.challengeScores).reduce((sum, s) => sum + s, 0)
+    recordLeaderboardScore(state.storeId, {
+      tag: state.bossCleared ? 'MASTER-ROUTER' : 'YOU',
+      title: state.bossCleared ? 'Deadline Boss Cleared' : "Today’s Challenger",
+      score: total,
+      maxCombo: state.maxCombo ?? 0,
+      bossCleared: Boolean(state.bossCleared),
+    })
+    setLeaderboardRecorded(true)
+  }, [phase, leaderboardRecorded])
   const startTimeRef = useRef<number>(Date.now())
   const localRoutesRef = useRef<Record<string, PacketRoute>>({})
 
@@ -925,21 +940,6 @@ export default function WebGameStage({
     )
   }
 
-  const [leaderboardRecorded, setLeaderboardRecorded] = useState(false)
-
-  useEffect(() => {
-    if (phase !== 'race-finish' || leaderboardRecorded) return
-    const state = useGameStore.getState()
-    const total = Object.values(state.challengeScores).reduce((sum, s) => sum + s, 0)
-    recordLeaderboardScore(state.storeId, {
-      tag: state.bossCleared ? 'MASTER-ROUTER' : 'YOU',
-      title: state.bossCleared ? 'Deadline Boss Cleared' : 'Today’s Challenger',
-      score: total,
-      maxCombo: state.maxCombo ?? 0,
-      bossCleared: Boolean(state.bossCleared),
-    })
-    setLeaderboardRecorded(true)
-  }, [phase, leaderboardRecorded])
 
   if (phase === 'race-finish') {
     const state = useGameStore.getState()
