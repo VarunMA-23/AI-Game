@@ -244,4 +244,8 @@ export interface GameState {
   handoffPending: boolean
   selectedBundle?: string | null
   maxBudget?: number
+  combo?: number
+  maxCombo?: number
+  bossCleared?: boolean
+  lastEngineMood?: Partial<Record<Engine, 'idle' | 'happy' | 'strained'>>
 }

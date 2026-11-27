@@ -61,6 +61,10 @@ const createInitialState = (): GameState => ({
   handoffPending: false,
   selectedBundle: null,
   maxBudget: 150000,
+  combo: 0,
+  maxCombo: 0,
+  bossCleared: false,
+  lastEngineMood: { CPU: 'idle', GPU: 'idle', NPU: 'idle' },
 })
 
 const skippedSet = (statuses: Record<ChallengeId, ChallengeStatus>): Set<ChallengeId> =>
@@ -82,6 +86,8 @@ interface GameActions {
   finalizeSession: () => void
   setHandoffPending: (pending: boolean) => void
   setShopperPreferences: (prefs: { selectedBundle?: string | null; maxBudget?: number }) => void
+  recordCombo: (isGood: boolean, engine: Engine) => number
+  setBossCleared: (cleared: boolean) => void
   resetChallengeRoutes: (challengeId: ChallengeId) => void
   routePacket: (
     challengeId: ChallengeId,
@@ -157,6 +163,25 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         prefs.selectedBundle !== undefined ? prefs.selectedBundle : state.selectedBundle,
       maxBudget: prefs.maxBudget !== undefined ? prefs.maxBudget : state.maxBudget,
     })),
+  recordCombo: (isGood, engine) => {
+    let nextCombo = 0
+    set((state) => {
+      nextCombo = isGood ? (state.combo ?? 0) + 1 : 0
+      const maxCombo = Math.max(state.maxCombo ?? 0, nextCombo)
+      return {
+        combo: nextCombo,
+        maxCombo,
+        lastEngineMood: {
+          CPU: 'idle',
+          GPU: 'idle',
+          NPU: 'idle',
+          [engine]: isGood ? 'happy' : 'strained',
+        },
+      }
+    })
+    return nextCombo
+  },
+  setBossCleared: (cleared) => set({ bossCleared: cleared }),
   resetChallengeRoutes: (challengeId) =>
     set((state) => {
       const challenge = gameConfig.challenges.find((item) => item.id === challengeId)

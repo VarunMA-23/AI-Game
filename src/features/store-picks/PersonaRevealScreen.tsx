@@ -20,6 +20,8 @@ export default function PersonaRevealScreen() {
   const startedAt = useGameStore((state) => state.startedAt)
   const completedAt = useGameStore((state) => state.completedAt)
   const race = useGameStore((state) => state.race)
+  const maxCombo = useGameStore((state) => state.maxCombo ?? 0)
+  const bossCleared = useGameStore((state) => state.bossCleared ?? false)
   const setPhase = useGameStore((state) => state.setPhase)
   const definition = getPersonaDefinition(persona)
   const summary = buildScoringSummary({
@@ -57,10 +59,14 @@ export default function PersonaRevealScreen() {
     >
       <div className={`trading-card trading-card--${card.rarity.toLowerCase()}`}>
         <div className="trading-card-top">
-          <span className="rarity-pill">
-            <Award size={16} aria-hidden="true" />
-            {card.rarity} Tier
-          </span>
+          <div className="trading-badges">
+            <span className="rarity-pill">
+              <Award size={16} aria-hidden="true" />
+              {card.rarity} Tier
+            </span>
+            {bossCleared && <span className="boss-medal-pill">Master Router Boss</span>}
+            {maxCombo >= 2 && <span className="combo-pill">{maxCombo}x Max Streak</span>}
+          </div>
           <span className="trading-card-score">{summary.total} / 1000 PTS</span>
         </div>
 

@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Cpu, WifiOff } from 'lucide-react'
+import { Activity, CloudOff, Cpu, Wifi, WifiOff } from 'lucide-react'
 
-const SAMPLE_CONTRACT =
-  'Section 1: Confidential pilot terms remain strictly internal to the buyer and vendor. ' +
-  'Section 2: On-device AI processing ensures zero document text is transmitted to external cloud servers. ' +
-  'Section 3: Warranty covers 24 months of hardware support and battery diagnostics. ' +
-  'Section 4: Final pricing is locked at store checkout with verified in-stock serial numbers.'
+const SAMPLE_NOTES =
+  'Lecture 7: Neural Processing Units (NPUs) run matrix math for local summaries and background blur at low wattage. ' +
+  'Unlike cloud chatbots, on-device AI keeps confidential notes and exam prep on your laptop with zero Wi-Fi required. ' +
+  'Battery life depends on display brightness, battery Wh rating, and compatible software.'
 
 function summarizeLocally(text: string): { summary: string[]; ms: number } {
   const start = performance.now()
@@ -13,7 +12,7 @@ function summarizeLocally(text: string): { summary: string[]; ms: number } {
     .split(/(?<=[.!?])\s+/)
     .map((s) => s.trim())
     .filter(Boolean)
-  const keywords = ['confidential', 'on-device', 'zero', 'warranty', 'pricing']
+  const keywords = ['npu', 'on-device', 'zero wi-fi', 'confidential', 'low wattage']
   const scored = sentences.map((sentence) => {
     const lower = sentence.toLowerCase()
     const hits = keywords.reduce((acc, kw) => acc + (lower.includes(kw) ? 1 : 0), 0)
@@ -25,10 +24,13 @@ function summarizeLocally(text: string): { summary: string[]; ms: number } {
 }
 
 export default function LiveOnDeviceDemo() {
-  const [mode, setMode] = useState<'blur' | 'summary'>('blur')
+  const [mode, setMode] = useState<'summary' | 'blur'>('summary')
+  const [internetOff, setInternetOff] = useState(true)
   const [blurOn, setBlurOn] = useState(true)
   const [blurMs, setBlurMs] = useState(0)
-  const [summaryResult, setSummaryResult] = useState<{ summary: string[]; ms: number } | null>(null)
+  const [summaryResult, setSummaryResult] = useState<{ summary: string[]; ms: number }>(() =>
+    summarizeLocally(SAMPLE_NOTES),
+  )
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -42,7 +44,6 @@ export default function LiveOnDeviceDemo() {
     const h = canvas.height
     ctx.clearRect(0, 0, w, h)
 
-    // Background office scene
     ctx.save()
     if (blurOn) {
       ctx.filter = 'blur(6px)'
@@ -57,7 +58,6 @@ export default function LiveOnDeviceDemo() {
     ctx.fillRect(96, 14, 78, 44)
     ctx.restore()
 
-    // Crisp foreground subject
     ctx.fillStyle = '#0068b5'
     ctx.beginPath()
     ctx.arc(w / 2, h / 2 - 12, 22, 0, Math.PI * 2)
@@ -72,68 +72,104 @@ export default function LiveOnDeviceDemo() {
   return (
     <div className="live-proof-box">
       <div className="live-proof-head">
-        <span className="live-proof-badge">
-          <WifiOff size={14} aria-hidden="true" />
-          OFFLINE — Running 100% on this machine
-        </span>
+        <div>
+          <strong className="live-proof-hook-title">
+            The Internet Goes Away. Your AI Doesn&apos;t.
+          </strong>
+          <div className="live-proof-badges">
+            <span className={`live-proof-badge ${internetOff ? 'live-proof-badge--offline' : ''}`}>
+              {internetOff ? <WifiOff size={14} aria-hidden="true" /> : <Wifi size={14} aria-hidden="true" />}
+              {internetOff ? 'INTERNET DISCONNECTED' : 'ONLINE'}
+            </span>
+            <span className="live-proof-net">
+              <Activity size={14} aria-hidden="true" />
+              Network activity: 0 requests · 0 bytes sent
+            </span>
+          </div>
+        </div>
+
         <div className="live-proof-tabs">
           <button
             type="button"
-            className={`live-proof-tab ${mode === 'blur' ? 'live-proof-tab--active' : ''}`}
-            onClick={() => setMode('blur')}
+            className="small-button"
+            onClick={() => setInternetOff((v) => !v)}
           >
-            Local Portrait Blur
+            {internetOff ? 'Reconnect Wi-Fi' : 'Disconnect Wi-Fi'}
           </button>
           <button
             type="button"
             className={`live-proof-tab ${mode === 'summary' ? 'live-proof-tab--active' : ''}`}
             onClick={() => {
               setMode('summary')
-              setSummaryResult(summarizeLocally(SAMPLE_CONTRACT))
+              setSummaryResult(summarizeLocally(SAMPLE_NOTES))
             }}
           >
-            Local Note Summary
+            Local Summary
+          </button>
+          <button
+            type="button"
+            className={`live-proof-tab ${mode === 'blur' ? 'live-proof-tab--active' : ''}`}
+            onClick={() => setMode('blur')}
+          >
+            Local Blur
           </button>
         </div>
       </div>
 
-      {mode === 'blur' ? (
-        <div className="live-proof-content">
-          <canvas
-            ref={canvasRef}
-            width={280}
-            height={130}
-            className="live-proof-canvas"
-            aria-label="Local portrait background blur preview"
-          />
-          <div className="live-proof-meta">
-            <p>
-              <strong>Zero network calls.</strong> Background blur is computed locally on your browser canvas in{' '}
-              <strong>{blurMs} ms</strong>.
-            </p>
-            <button
-              type="button"
-              className="small-button"
-              onClick={() => setBlurOn((v) => !v)}
-            >
-              <Cpu size={16} aria-hidden="true" />
-              {blurOn ? 'Disable Local Blur' : 'Enable Local Blur'}
-            </button>
+      <div className="offline-compare-grid">
+        <div className={`offline-compare-card ${internetOff ? 'offline-compare-card--fail' : ''}`}>
+          <div className="offline-compare-head">
+            <CloudOff size={16} aria-hidden="true" />
+            <strong>Cloud AI (e.g. online chatbot)</strong>
           </div>
-        </div>
-      ) : (
-        <div className="live-proof-summary">
-          <p className="live-proof-source">
-            <strong>Local summary ({summaryResult?.ms ?? 0.4} ms, 0 bytes sent):</strong>
+          <p>
+            {internetOff
+              ? 'Blocked — No internet connection. Cannot summarize notes or process files on a flight, train, or weak Wi-Fi.'
+              : 'Requires uploading your document to an external server over the internet.'}
           </p>
-          <ul>
-            {(summaryResult?.summary ?? []).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
         </div>
-      )}
+
+        <div className="offline-compare-card offline-compare-card--ok">
+          <div className="offline-compare-head">
+            <Cpu size={16} aria-hidden="true" />
+            <strong>On-Device AI (This Machine)</strong>
+          </div>
+          {mode === 'summary' ? (
+            <div className="live-proof-summary">
+              <p>
+                <strong>Completed locally in {summaryResult.ms} ms</strong> — 0 network requests:
+              </p>
+              <ul>
+                {summaryResult.summary.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="live-proof-content">
+              <canvas
+                ref={canvasRef}
+                width={220}
+                height={104}
+                className="live-proof-canvas"
+                aria-label="Local portrait background blur preview"
+              />
+              <div className="live-proof-meta">
+                <p>
+                  <strong>{blurMs} ms</strong> local render.
+                </p>
+                <button
+                  type="button"
+                  className="small-button"
+                  onClick={() => setBlurOn((v) => !v)}
+                >
+                  {blurOn ? 'Disable Blur' : 'Enable Blur'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
-

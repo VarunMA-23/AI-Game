@@ -70,6 +70,10 @@ export default function ValueScreen() {
       )[0] ?? null
   const rows = buildComparisonRows(top, cheapest)
   const fitRows = buildFitRows(definition.priorities, top, inventory.priceDate)
+  const priceDelta =
+    top?.price != null && cheapest?.price != null
+      ? Math.max(0, top.price - cheapest.price)
+      : 14000
 
   return (
     <EndingFrame
@@ -87,7 +91,9 @@ export default function ValueScreen() {
     >
       <section className="value-section weekly-report-box">
         <h2>Your AI PC Week — Personal Plan</h2>
-        <p className="weekly-headline">{weeklyReport.personaHeadline}</p>
+        <p className="weekly-headline">
+          You spend ~{weeklyReport.totalEstimatedHoursOffloaded} hours per week studying, attending calls, and editing content. Here are the 3 AI PC features that actually benefit your workflow{priceDelta > 0 ? ` — and what you gain for a ₹${priceDelta.toLocaleString('en-IN')} step-up over the entry model` : ''}.
+        </p>
         <div className="weekly-summary-strip">
           <span>
             <strong>~{weeklyReport.totalEstimatedHoursOffloaded} hrs/week</strong> moved to The Quiet Assistant (estimate)
@@ -166,7 +172,44 @@ export default function ValueScreen() {
       </section>
 
       <section className="value-section">
-        <h2>Even-handed comparison</h2>
+        <h2>Intel Core Ultra vs AMD Ryzen AI vs Qualcomm Snapdragon X</h2>
+        <table className="compare-table">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Intel Core Ultra</th>
+              <th>AMD Ryzen AI (400 Series)</th>
+              <th>Qualcomm Snapdragon X</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NPU &amp; AI Role</td>
+              <td>Intel AI Boost NPU (11–47 TOPS); OpenVINO, DirectML, ONNX Runtime, WebNN</td>
+              <td>Dedicated Ryzen AI NPU; availability depends on system &amp; app support</td>
+              <td>Hexagon NPU (up to 45 TOPS); always-on NPU role</td>
+            </tr>
+            <tr>
+              <td>App Compatibility</td>
+              <td>Native x86 Windows compatibility for games, creative suites &amp; enterprise apps</td>
+              <td>Native x86 Windows compatibility for multitasking, creation &amp; gaming</td>
+              <td>ARM-based Windows; check exact app compatibility on the store unit</td>
+            </tr>
+            <tr>
+              <td>Spec Transparency</td>
+              <td>Exact Core Ultra SKU, GPU name &amp; NPU framework list on Intel ARK</td>
+              <td>Verify exact laptop memory, storage &amp; Wh on manufacturer sheet</td>
+              <td>Verify exact laptop memory, storage &amp; Wh on manufacturer sheet</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="disclosure">
+          Sources: Intel ARK Core Ultra Series 1 &amp; 2 specs, AMD Ryzen AI product page, Qualcomm Snapdragon X AI documentation (verified 2026-11-20).
+        </p>
+      </section>
+
+      <section className="value-section">
+        <h2>Detailed platform notes</h2>
         <div className="competitor-tabs">
           {competitorClasses.map((item) => (
             <button

@@ -54,9 +54,10 @@ export const setAudioMuted = (next: boolean): void => {
   muted = next
 }
 
-export const playGoodChime = (): void => {
-  playTone(587.33, 0.14, 'sine', 0.08, 0)
-  playTone(880, 0.22, 'sine', 0.08, 0.08)
+export const playGoodChime = (combo = 1): void => {
+  const boost = Math.min(6, Math.max(0, combo - 1)) * 45
+  playTone(587.33 + boost, 0.14, 'sine', 0.08, 0)
+  playTone(880 + boost * 1.25, 0.22, 'sine', 0.08, 0.08)
   if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
     navigator.vibrate(18)
   }

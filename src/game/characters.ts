@@ -1,10 +1,13 @@
 import type { Engine } from '../types/game'
 
+export type CharacterMood = 'idle' | 'happy' | 'strained'
+
 export interface EngineCharacter {
   engine: Engine
   name: string
   role: string
   tagline: string
+  avatars: Record<CharacterMood, string>
   goodLines: string[]
   badLines: string[]
 }
@@ -15,6 +18,11 @@ export const ENGINE_CHARACTERS: Record<Engine, EngineCharacter> = {
     name: 'The Generalist',
     role: 'Everyday coordinator',
     tagline: 'Handles tabs, docs & logic fast',
+    avatars: {
+      idle: '🧠',
+      happy: '😎',
+      strained: '😅',
+    },
     goodLines: [
       'The Generalist: "Right in my wheelhouse — handled cleanly."',
       'The Generalist: "Quick, predictable, zero drama."',
@@ -29,6 +37,11 @@ export const ENGINE_CHARACTERS: Record<Engine, EngineCharacter> = {
     name: 'The Heavy Lifter',
     role: 'Visuals & rendering powerhouse',
     tagline: 'Built for games, video & filters',
+    avatars: {
+      idle: '🎮',
+      happy: '🔥',
+      strained: '🥵',
+    },
     goodLines: [
       'The Heavy Lifter: "Frames locked. Pixels flying."',
       'The Heavy Lifter: "Heavy graphics? That is what I am here for."',
@@ -43,6 +56,11 @@ export const ENGINE_CHARACTERS: Record<Engine, EngineCharacter> = {
     name: 'The Quiet Assistant',
     role: 'On-device AI specialist',
     tagline: 'Low-power blur, summaries & privacy',
+    avatars: {
+      idle: '✨',
+      happy: '🤫',
+      strained: '🤔',
+    },
     goodLines: [
       'The Quiet Assistant: "Done silently on-device — CPU and GPU stay free."',
       'The Quiet Assistant: "Zero cloud upload, barely a ripple on battery."',

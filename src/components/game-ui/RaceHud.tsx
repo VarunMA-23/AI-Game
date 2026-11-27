@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Volume2, VolumeX } from 'lucide-react'
+import { Flame, Volume2, VolumeX } from 'lucide-react'
 import BrandMark from '../common/BrandMark'
 import { gameConfig, getChallengeByIndex } from '../../game/config/loadConfig'
 import { ENGINE_CHARACTERS } from '../../game/characters'
@@ -12,6 +12,8 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
   const currentChallenge = useGameStore((state) => state.currentChallenge)
   const remainingMs = useGameStore((state) => state.remainingMs)
   const race = useGameStore((state) => state.race)
+  const combo = useGameStore((state) => state.combo ?? 0)
+  const lastEngineMood = useGameStore((state) => state.lastEngineMood)
   const skipChallenge = useGameStore((state) => state.skipChallenge)
   const [muted, setMuted] = useState(isAudioMuted())
 
@@ -33,6 +35,8 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
     setMuted(next)
   }
 
+  const multiplier = combo >= 5 ? '3x' : combo >= 3 ? '2x' : combo >= 2 ? '1.5x' : null
+
   const title = challenge
     ? challenge.id === 'battery-escape'
       ? 'DEADLINE DAY — BOSS BATTLE'
@@ -43,7 +47,7 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
 
   const scenario = challenge
     ? challenge.id === 'battery-escape'
-      ? 'Six tasks arrive on a live timer. Route each one before the day runs out!'
+      ? 'Six tasks arrive on a live timer. Route 4+ right to unlock the Master Router boss reward!'
       : challenge.scenario
     : 'Your routing choices decide who wins.'
 
@@ -59,6 +63,12 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
           <p className="hud-scenario">{scenario}</p>
         </div>
         <div className="hud-controls">
+          {multiplier && (
+            <span className="hud-combo-badge" aria-label={`Combo ${combo}`}>
+              <Flame size={16} aria-hidden="true" />
+              {combo} STREAK · {multiplier}
+            </span>
+          )}
           <button
             type="button"
             className="hud-sound-btn"
@@ -83,8 +93,10 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
       <div className="hud-cast" aria-label="Engine characters">
         {(['CPU', 'GPU', 'NPU'] as const).map((eng) => {
           const char = ENGINE_CHARACTERS[eng]
+          const mood = lastEngineMood?.[eng] ?? 'idle'
           return (
-            <div key={eng} className={`hud-cast-pill hud-cast-pill--${eng.toLowerCase()}`}>
+            <div key={eng} className={`hud-cast-pill hud-cast-pill--${mood}`}>
+              <span className="hud-cast-avatar" aria-hidden="true">{char.avatars[mood]}</span>
               <strong>{eng}</strong>
               <span>{char.name}</span>
             </div>

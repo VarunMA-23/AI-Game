@@ -8,6 +8,7 @@ import {
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
+  Trophy,
   UploadCloud,
 } from 'lucide-react'
 import { allPackets, gameConfig, getChallenge, getChallengeByIndex } from '../../game/config/loadConfig'
@@ -24,6 +25,7 @@ import { scoreStreamNight } from '../../game/scoring/streamNight'
 import type { StreamNightChoice } from '../../game/scoring/streamNight'
 import { scoreStudySprint } from '../../game/scoring/studySprint'
 import { playCompleteChord, playGoodChime, playWarnHum } from '../../services/audio/kioskAudio'
+import { listDailyLeaderboard, recordLeaderboardScore } from '../../services/storage/leaderboardStorage'
 import { useGameStore } from '../../store/gameStore'
 import type { ChallengeDefinition, ChallengeId, Engine, PacketRoute } from '../../types/game'
 import LiveOnDeviceDemo from './LiveOnDeviceDemo'
@@ -686,7 +688,8 @@ function DeadlineDayBossView({
       setPacketChoices(nextPackets)
       isGood = outcome.isGood
     } else {
-      if (isGood) playGoodChime()
+      const nextCombo = useGameStore.getState().recordCombo(isGood, engine)
+      if (isGood) playGoodChime(nextCombo)
       else playWarnHum()
     }
 
@@ -695,14 +698,24 @@ function DeadlineDayBossView({
       challenge.packets,
       gameConfig.scoring,
     )
-    onProgress(updated.score)
+    const correctBossTasks = DEADLINE_TASKS.filter((t) => nextTasks[t.id] === t.bestEngine).length
+    const bossBonus =
+      Object.keys(nextTasks).length === DEADLINE_TASKS.length && correctBossTasks >= 4 ? 100 : 0
+    if (bossBonus > 0) {
+      useGameStore.getState().setBossCleared(true)
+    }
+
+    onProgress(Math.min(gameConfig.scoring.maxScore, updated.score + bossBonus))
     onFeedback(
       getCharacterVoiceLine(engine, isGood),
       isGood ? 'success' : 'warn',
     )
 
     if (Object.keys(nextTasks).length === DEADLINE_TASKS.length) {
-      onComplete(updated.score, updated.subscores)
+      onComplete(
+        Math.min(gameConfig.scoring.maxScore, updated.score + bossBonus),
+        updated.subscores,
+      )
     }
   }
 
@@ -838,8 +851,9 @@ export default function WebGameStage({
       setFallbackCount((c) => c + 1)
     }
 
+    const nextCombo = useGameStore.getState().recordCombo(isGood, engine)
     if (isGood) {
-      playGoodChime()
+      playGoodChime(nextCombo)
     } else {
       playWarnHum()
     }
@@ -911,7 +925,25 @@ export default function WebGameStage({
     )
   }
 
+  const [leaderboardRecorded, setLeaderboardRecorded] = useState(false)
+
+  useEffect(() => {
+    if (phase !== 'race-finish' || leaderboardRecorded) return
+    const state = useGameStore.getState()
+    const total = Object.values(state.challengeScores).reduce((sum, s) => sum + s, 0)
+    recordLeaderboardScore(state.storeId, {
+      tag: state.bossCleared ? 'MASTER-ROUTER' : 'YOU',
+      title: state.bossCleared ? 'Deadline Boss Cleared' : 'Today’s Challenger',
+      score: total,
+      maxCombo: state.maxCombo ?? 0,
+      bossCleared: Boolean(state.bossCleared),
+    })
+    setLeaderboardRecorded(true)
+  }, [phase, leaderboardRecorded])
+
   if (phase === 'race-finish') {
+    const state = useGameStore.getState()
+    const entries = listDailyLeaderboard(state.storeId)
     const winner =
       race.rightProgress > race.leftProgress
         ? 'AI PC (with The Quiet Assistant) finished ahead!'
@@ -925,9 +957,30 @@ export default function WebGameStage({
           <Cpu size={28} aria-hidden="true" />
           <div>
             <h2>{winner}</h2>
-            <p>Your routing choices shaped your AI PC Week plan and collectible trading card.</p>
+            <p>
+              Max combo: <strong>{state.maxCombo ?? 0}x</strong>
+              {state.bossCleared ? ' · Master Router Boss Reward (+100) unlocked!' : ''}
+            </p>
           </div>
         </div>
+
+        <div className="leaderboard-box">
+          <div className="leaderboard-head">
+            <Trophy size={18} aria-hidden="true" />
+            <strong>Today&apos;s Store Leaderboard ({state.storeId})</strong>
+          </div>
+          <ol className="leaderboard-list">
+            {entries.slice(0, 5).map((entry, idx) => (
+              <li key={entry.id} className="leaderboard-row">
+                <span className="leaderboard-rank">#{idx + 1}</span>
+                <span className="leaderboard-tag">{entry.tag}</span>
+                <span className="leaderboard-title">{entry.title}</span>
+                <strong className="leaderboard-score">{entry.score} pts</strong>
+              </li>
+            ))}
+          </ol>
+        </div>
+
         <LiveOnDeviceDemo />
         <div className="web-stage-actions">
           <button type="button" className="primary-button" onClick={onAdvance}>
