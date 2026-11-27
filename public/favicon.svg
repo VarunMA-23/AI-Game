@@ -1,6 +1,59 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#071426"/>
-  <path d="M12 40L26 18H38L52 40" stroke="#00A8FF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M20 40H44" stroke="#00E5FF" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="32" cy="40" r="4" fill="#FFFFFF"/>
+  <!-- Rounded background with Intel blue gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#0068b5"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="18" y1="18" x2="46" y2="46">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+
+  <!-- Processor chip shape -->
+  <rect x="16" y="16" width="32" height="32" rx="6" fill="url(#chip)" opacity="0.95"/>
+  <rect x="20" y="20" width="24" height="24" rx="4" fill="#0068b5" opacity="0.12"/>
+
+  <!-- Circuit pins radiating outward -->
+  <g stroke="#bae6fd" stroke-width="2.4" stroke-linecap="round">
+    <!-- Top pins -->
+    <line x1="26" y1="16" x2="26" y2="8"/>
+    <line x1="32" y1="16" x2="32" y2="6"/>
+    <line x1="38" y1="16" x2="38" y2="8"/>
+    <!-- Bottom pins -->
+    <line x1="26" y1="48" x2="26" y2="56"/>
+    <line x1="32" y1="48" x2="32" y2="58"/>
+    <line x1="38" y1="48" x2="38" y2="56"/>
+    <!-- Left pins -->
+    <line x1="16" y1="26" x2="8" y2="26"/>
+    <line x1="16" y1="32" x2="6" y2="32"/>
+    <line x1="16" y1="38" x2="8" y2="38"/>
+    <!-- Right pins -->
+    <line x1="48" y1="26" x2="56" y2="26"/>
+    <line x1="48" y1="32" x2="58" y2="32"/>
+    <line x1="48" y1="38" x2="56" y2="38"/>
+  </g>
+
+  <!-- Pin endpoints (dots) -->
+  <g fill="#c8ff3d">
+    <circle cx="26" cy="7" r="2"/>
+    <circle cx="32" cy="5" r="2"/>
+    <circle cx="38" cy="7" r="2"/>
+    <circle cx="26" cy="57" r="2"/>
+    <circle cx="32" cy="59" r="2"/>
+    <circle cx="38" cy="57" r="2"/>
+    <circle cx="7" cy="26" r="2"/>
+    <circle cx="5" cy="32" r="2"/>
+    <circle cx="7" cy="38" r="2"/>
+    <circle cx="57" cy="26" r="2"/>
+    <circle cx="59" cy="32" r="2"/>
+    <circle cx="57" cy="38" r="2"/>
+  </g>
+
+  <!-- AI sparkle in center of chip -->
+  <path d="M32 24L33.8 29.2L39 31L33.8 32.8L32 38L30.2 32.8L25 31L30.2 29.2Z" fill="#c8ff3d"/>
+  <path d="M32 26L33 29.5L36.5 31L33 32.5L32 36L31 32.5L27.5 31L31 29.5Z" fill="#ffffff" opacity="0.7"/>
 </svg>
