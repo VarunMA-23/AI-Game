@@ -1,0 +1,42 @@
+{
+  "maxScore": 200,
+  "studySprint": {
+    "pointsPerCorrect": 30,
+    "penaltyPerIncorrect": 15,
+    "completionBonus": 30,
+    "timeBonus": 20,
+    "timeThresholdMs": 15000
+  },
+  "creatorMode": {
+    "pointsPerStep": 30,
+    "pointsPerRoute": 30,
+    "completionBonus": 30,
+    "timeBonus": 20,
+    "timeThresholdMs": 15000
+  },
+  "privacyShield": {
+    "localPoints": 110,
+    "leakBonus": 55,
+    "completionBonus": 25,
+    "timeBonus": 10,
+    "timeThresholdMs": 15000
+  },
+  "streamNight": {
+    "pointsPerCorrectRoute": 35,
+    "stabilityWeight": 80,
+    "stabilityPenaltyPerWrongRoute": 34,
+    "timeBonus": 15,
+    "timeThresholdMs": 18000
+  },
+  "batteryEscape": {
+    "pointsPerCorrectRoute": 20,
+    "batteryWeight": 80,
+    "timeBonus": 20,
+    "timeThresholdMs": 18000,
+    "startingBattery": 100,
+    "baseDrain": 7,
+    "gpuSuitableDrain": 2,
+    "lowNpuDrain": 5,
+    "highNpuDrain": 3
+  }
+}

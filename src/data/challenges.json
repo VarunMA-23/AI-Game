@@ -1,0 +1,212 @@
+{
+  "challenges": [
+    {
+      "id": "study-sprint",
+      "index": 1,
+      "title": "Study Sprint",
+      "category": "Learning and productivity",
+      "scenario": "Your exam is tomorrow. Turn tonight's lecture notes into five revision points.",
+      "objective": "Drag five key concepts into the summary tray.",
+      "educationalMessage": "AI can turn long notes into short summaries. On supported Intel AI PCs, compatible apps can run that work on the device.",
+      "demoLabel": "Demo content",
+      "timeLimitMs": 25000,
+      "packets": [
+        {
+          "id": "notes-summary",
+          "label": "Notes summary",
+          "npuCompatible": true,
+          "gpuSuitable": true,
+          "npuBenefit": "low",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "NPU",
+          "caption": "The summary app supports on-device processing."
+        }
+      ],
+      "concepts": [
+        { "id": "c1", "label": "Active recall", "correct": true },
+        { "id": "c2", "label": "Spaced repetition", "correct": true },
+        { "id": "c3", "label": "Past-paper practice", "correct": true },
+        { "id": "c4", "label": "Teach it back", "correct": true },
+        { "id": "c5", "label": "Sleep and rest", "correct": true },
+        { "id": "d1", "label": "Read once only", "correct": false },
+        { "id": "d2", "label": "Highlight everything", "correct": false },
+      { "id": "d3", "label": "Practice questions", "correct": true },
+      { "id": "d4", "label": "Explain in your own words", "correct": true }
+
+      ]
+    },
+    {
+      "id": "creator-mode",
+      "index": 2,
+      "title": "Creator Mode",
+      "category": "Creativity",
+      "scenario": "Your photo for tonight's post needs a glow-up.",
+      "objective": "Apply the three tools in the right order.",
+      "educationalMessage": "AI creative tools can edit and enhance photos faster. On supported Intel AI PCs, some of these effects can run on the device, while others run on the GPU.",
+      "demoLabel": "Demo content",
+      "timeLimitMs": 25000,
+      "packets": [
+        {
+          "id": "background-removal",
+          "label": "Background removal",
+          "npuCompatible": true,
+          "gpuSuitable": true,
+          "npuBenefit": "low",
+          "fallbackEngine": "GPU",
+          "defaultEngine": "NPU",
+          "caption": "This effect can run on the device in a compatible app."
+        },
+        {
+          "id": "style-filter",
+          "label": "Style filter",
+          "npuCompatible": false,
+          "gpuSuitable": true,
+          "npuBenefit": "none",
+          "fallbackEngine": "GPU",
+          "defaultEngine": "GPU",
+          "caption": "This effect stays on the GPU in this demo."
+        }
+      ],
+      "tools": [
+        { "id": "background-removal", "label": "Remove background", "order": 1 },
+        { "id": "enhance", "label": "Enhance", "order": 2 },
+        { "id": "style-filter", "label": "Apply style", "order": 3 }
+      ]
+    },
+    {
+      "id": "privacy-shield",
+      "index": 3,
+      "title": "Privacy Shield",
+      "category": "Privacy",
+      "scenario": "A confidential contract needs an AI summary. Where should it be processed?",
+      "objective": "Choose where the document is processed.",
+      "educationalMessage": "Compatible AI apps can run on your device, so your document doesn't leave it. Privacy depends on the app and its settings, not only on the chip.",
+      "resultLine": "Keeping the file on the device means it isn't sent to a cloud service. It doesn't make the app or the operating system private. Check the app's privacy settings.",
+      "timeLimitMs": 25000,
+      "packets": [
+        {
+          "id": "confidential-document",
+          "label": "Confidential document",
+          "npuCompatible": true,
+          "gpuSuitable": false,
+          "npuBenefit": "low",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "NPU",
+          "caption": "On-device processing keeps the file on this machine."
+        }
+      ],
+      "followUp": {
+        "prompt": "What can still expose the document?",
+        "correctId": "app-settings",
+        "options": [
+          { "id": "app-settings", "label": "The app's own settings" },
+          { "id": "chip-only", "label": "Nothing once the chip is involved" }
+        ]
+      }
+    },
+    {
+      "id": "stream-night",
+      "index": 4,
+      "title": "Stream Night",
+      "category": "Gaming and multitasking",
+      "scenario": "You're gaming, streaming to friends and joining a call. Everything has to stay smooth.",
+      "objective": "Route GAME, STREAM and CALL blur to the right engine.",
+      "educationalMessage": "A game leans on the GPU. Background blur and some AI effects can run on the NPU, so your game keeps its smoothness.",
+      "timeLimitMs": 25000,
+      "packets": [
+        {
+          "id": "game",
+          "label": "GAME",
+          "npuCompatible": false,
+          "gpuSuitable": true,
+          "npuBenefit": "none",
+          "fallbackEngine": "GPU",
+          "defaultEngine": "GPU",
+          "caption": "Games lean on the GPU. This task isn't set up for the NPU here."
+        },
+        {
+          "id": "stream",
+          "label": "STREAM",
+          "npuCompatible": false,
+          "gpuSuitable": true,
+          "npuBenefit": "none",
+          "fallbackEngine": "GPU",
+          "defaultEngine": "GPU",
+          "caption": "Stream encoding stays with the GPU in this demo."
+        },
+        {
+          "id": "call-blur",
+          "label": "CALL blur",
+          "npuCompatible": true,
+          "gpuSuitable": false,
+          "npuBenefit": "low",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "NPU",
+          "caption": "Voice background blur can run on the NPU in a compatible app."
+        }
+      ]
+    },
+    {
+      "id": "battery-escape",
+      "index": 5,
+      "title": "Battery Escape",
+      "category": "Power efficiency",
+      "scenario": "You're at a café on 20% battery with work left to finish.",
+      "objective": "Route five tasks while keeping the illustrative meter steady.",
+      "educationalMessage": "Dedicated AI engines can run some AI tasks using less power than general-purpose processors. Not every task benefits, and real battery life depends on the battery, screen, software and what you do.",
+      "timeLimitMs": 25000,
+      "packets": [
+        {
+          "id": "background-blur-batch",
+          "label": "Background blur batch",
+          "npuCompatible": true,
+          "gpuSuitable": false,
+          "npuBenefit": "high",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "NPU",
+          "caption": "This batch can use the NPU in a compatible app."
+        },
+        {
+          "id": "spreadsheet-recalc",
+          "label": "Spreadsheet recalculation",
+          "npuCompatible": false,
+          "gpuSuitable": false,
+          "npuBenefit": "none",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "CPU",
+          "caption": "Spreadsheets run on the CPU in this demo."
+        },
+        {
+          "id": "video-export",
+          "label": "GPU-heavy video export",
+          "npuCompatible": false,
+          "gpuSuitable": true,
+          "npuBenefit": "none",
+          "fallbackEngine": "GPU",
+          "defaultEngine": "GPU",
+          "caption": "Video export stays on the GPU in this demo."
+        },
+        {
+          "id": "notes-summary-batch",
+          "label": "Notes summary",
+          "npuCompatible": true,
+          "gpuSuitable": true,
+          "npuBenefit": "low",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "NPU",
+          "caption": "A compatible summary app can use the NPU here."
+        },
+        {
+          "id": "browser-tabs",
+          "label": "Browser tabs and documents",
+          "npuCompatible": false,
+          "gpuSuitable": false,
+          "npuBenefit": "none",
+          "fallbackEngine": "CPU",
+          "defaultEngine": "CPU",
+          "caption": "Browser tabs and documents run on the CPU in this demo."
+        }
+      ]
+    }
+  ]
+}

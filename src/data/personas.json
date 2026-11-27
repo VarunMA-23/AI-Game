@@ -1,0 +1,28 @@
+{
+  "personas": [
+    {
+      "id": "THE_LEARNER",
+      "name": "The Learner",
+      "priorities": ["Battery capacity", "RAM", "Price"],
+      "rankingKeys": ["batteryWh", "ram", "price"]
+    },
+    {
+      "id": "THE_CREATOR",
+      "name": "The Creator",
+      "priorities": ["RAM", "Storage", "NPU class"],
+      "rankingKeys": ["ram", "storage", "npuClass", "displayNote"]
+    },
+    {
+      "id": "THE_POWER_USER",
+      "name": "The Power User",
+      "priorities": ["RAM", "NPU class", "Battery capacity"],
+      "rankingKeys": ["ram", "npuClass", "batteryWh"]
+    },
+    {
+      "id": "THE_GAMER",
+      "name": "The Gamer",
+      "priorities": ["GPU class", "RAM", "Cooling note"],
+      "rankingKeys": ["gpu", "ram", "coolingNote"]
+    }
+  ]
+}

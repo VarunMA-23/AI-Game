@@ -1,0 +1,115 @@
+{
+  "competitors": [
+    {
+      "id": "amd-ryzen-ai",
+      "label": "AMD Ryzen AI",
+      "npuNote": "AMD Ryzen AI 400 Series processors include a dedicated NPU; AMD states availability depends on the system and application support.",
+      "npuSourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html",
+      "comparisonFacts": {
+        "memory": {
+          "value": "Memory depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html"
+        },
+        "storage": {
+          "value": "Storage depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html"
+        },
+        "battery": {
+          "value": "Battery capacity depends on the exact laptop; check the manufacturer's published Wh figure.",
+          "sourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html"
+        },
+        "appSupport": {
+          "value": "App support depends on the app and operating system; verify the exact app on the store unit.",
+          "sourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html"
+        }
+      },
+      "strengths": [
+        {
+          "text": "AMD lists Ryzen AI 400 Series laptops for multitasking, creation, gaming and battery life.",
+          "sourceUrl": "https://www.amd.com/en/products/processors/laptop/ryzen.html"
+        }
+      ],
+      "intelStrengths": [
+        {
+          "text": "Intel lists OpenVINO, WindowsML, DirectML, ONNX Runtime and WebNN support for Core Ultra NPU and CPU.",
+          "sourceUrl": "https://www.intel.com/content/www/us/en/products/sku/240961/intel-core-ultra-9-processor-288v-12m-cache-up-to-5-10-ghz/specifications.html"
+        }
+      ],
+      "lastVerified": "2026-11-20"
+    },
+    {
+      "id": "qualcomm-snapdragon-x",
+      "label": "Qualcomm Snapdragon X",
+      "npuNote": "Snapdragon X Series laptops use a Hexagon NPU alongside CPU and GPU; Qualcomm states current processors deliver up to 45 TOPS NPU performance.",
+      "npuSourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md",
+      "comparisonFacts": {
+        "memory": {
+          "value": "Memory depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md"
+        },
+        "storage": {
+          "value": "Storage depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md"
+        },
+        "battery": {
+          "value": "Battery capacity depends on the exact laptop; check the manufacturer's published Wh figure.",
+          "sourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md"
+        },
+        "appSupport": {
+          "value": "App support depends on the app and operating system; verify the exact app on the store unit.",
+          "sourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md"
+        }
+      },
+      "strengths": [
+        {
+          "text": "Qualcomm describes on-device AI and an always-on NPU role in Snapdragon X laptops.",
+          "sourceUrl": "https://www.qualcomm.com/snapdragon/laptops-and-tablets/consumer/ai.md"
+        }
+      ],
+      "intelStrengths": [
+        {
+          "text": "Intel ARK lists specific Core Ultra processor models, GPU names and NPU framework support for exact-model comparison.",
+          "sourceUrl": "https://www.intel.com/content/www/us/en/ark/products/series/241071/intel-core-ultra-processors-series-2.html"
+        }
+      ],
+      "lastVerified": "2026-11-20"
+    },
+    {
+      "id": "apple-m-series",
+      "label": "Apple M-series",
+      "npuNote": "Apple describes a dedicated Neural Engine in M-series chips for AI workloads.",
+      "npuSourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/",
+      "comparisonFacts": {
+        "memory": {
+          "value": "Memory depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/"
+        },
+        "storage": {
+          "value": "Storage depends on the exact laptop configuration; check the store unit and manufacturer sheet.",
+          "sourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/"
+        },
+        "battery": {
+          "value": "Battery capacity depends on the exact laptop; check the manufacturer's published Wh figure.",
+          "sourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/"
+        },
+        "appSupport": {
+          "value": "App support depends on the app and operating system; verify the exact app on the store unit.",
+          "sourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/"
+        }
+      },
+      "strengths": [
+        {
+          "text": "Apple documents Neural Engine use for Apple Intelligence and on-device AI features.",
+          "sourceUrl": "https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/"
+        }
+      ],
+      "intelStrengths": [
+        {
+          "text": "Intel lists exact processor, GPU and NPU framework details that shoppers can compare with the store's configuration list.",
+          "sourceUrl": "https://www.intel.com/content/www/us/en/products/sku/240961/intel-core-ultra-9-processor-288v-12m-cache-up-to-5-10-ghz/specifications.html"
+        }
+      ],
+      "lastVerified": "2026-11-20"
+    }
+  ]
+}

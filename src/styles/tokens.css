@@ -1,0 +1,16 @@
+:root {
+  --color-navy: #f7f8fa;
+  --color-navy-soft: #eef0f4;
+  --color-intel: #0068b5;
+  --color-electric: #0068b5;
+  --color-cyan: #0369a1;
+  --color-white: #111827;
+  --color-muted: #4b5563;
+  --color-success: #15803d;
+  --color-rival: #be123c;
+  --border-soft: #e2e5ea;
+  --border-strong: #cbd2dc;
+  --shadow-lane: 0 4px 20px rgba(17, 24, 39, 0.06);
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: Inter, system-ui, sans-serif;
+}
