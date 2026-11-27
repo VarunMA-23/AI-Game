@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="theme-color" content="#253c35" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23263f32'/%3E%3Ctext x='20' y='29' text-anchor='middle' font-size='30' fill='%23edd6a0'%3E✧%3C/text%3E%3C/svg%3E"
+    />
+    <title>INTEL: GLITCH · The Last Architect</title>
+    <script type="module" crossorigin src="./assets/main-pGL34obL.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-P2Xu9kJm.js">
+    <link rel="modulepreload" crossorigin href="./assets/terrain-Bi3adZss.js">
+    <link rel="modulepreload" crossorigin href="./assets/three-D_5PMAw7.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-TTLNCYcU.css">
+  </head>
+  <body>
+    <canvas
+      id="world"
+      aria-label="NEXUS three dimensional game world"
+    ></canvas>
+    <div id="glitch" aria-hidden="true"></div>
+    <div id="vignette"></div>
+    <main id="menu" class="screen">
+      <div class="masthead">
+        <span class="emblem">✧</span> NEXUS FIELD NOTES · 2049
+        <span class="edition">FINAL TRANSMISSION</span>
+      </div>
+      <section class="title-block">
+        <p class="eyebrow">A LIVING WORLD IS DISAPPEARING. YOU ARE ITS LAST ARCHITECT.</p>
+        <h1>INTEL: <span>GLITCH</span></h1>
+        <div class="title-rule"></div>
+        <p class="description">
+          Three ancient systems are offline.<br />Restore NEXUS before the sky forgets it existed.
+        </p>
+        <button id="start" disabled>
+          <span id="start-label">Restoring NEXUS</span
+          ><span class="arrow">↗</span>
+        </button>
+        <div id="load"><div id="load-bar"></div></div>
+        <p id="load-label">Rebuilding the fragments…</p>
+        <p class="menu-note">NOVA is waiting beside the crystal.</p>
+      </section>
+      <div class="menu-bottom">
+        <span>MIND · VISION · CORE</span
+        ><span class="tiny-line"></span
+        ><span>AN INTEL AI PC EXPERIENCE</span
+        ><button id="menu-quality" class="text-button">DETAIL: HIGH</button>
+      </div>
+    </main>
+    <div id="hud" hidden>
+      <header>
+        <div class="brand">cloudgarden <span>✧</span></div>
+        <div class="compass">
+          <span>W</span><span class="compass-line"></span
+          ><span id="bearing">N</span><span class="compass-line"></span
+          ><span>E</span>
+        </div>
+        <button id="pause-button" aria-label="Pause game">Ⅱ</button>
+      </header>
+      <section class="objective">
+        <p id="chapter">MISSION 00 · THE AWAKENING</p>
+        <h2 id="objective-title">Answer NOVA's signal</h2>
+        <div class="quest-dots">
+          <i></i><i></i><i></i><i></i><span id="quest-count">0 / 3 SYSTEMS</span>
+        </div>
+        <p id="objective-detail">
+          A holographic guardian waits beside the spawn crystal.
+        </p>
+        <p id="objective-nav" hidden></p>
+      </section>
+      <section id="tasks">
+        <p>SMALL TASKS <span id="task-count">0 / 4</span></p>
+        <ul id="task-list"></ul>
+      </section>
+      <div id="location">
+        <span class="location-line"></span
+        ><span id="location-name">THE FORGOTTEN ISLAND</span
+        ><span class="location-line"></span>
+      </div>
+      <div id="interact" hidden>
+        <kbd>E</kbd><span id="interact-text">Awaken the garden</span>
+      </div>
+      <div id="dialogue" hidden>
+        <p id="dialogue-speaker"></p>
+        <p id="dialogue-text"></p>
+        <p id="dialogue-options" hidden></p>
+      </div>
+      <div id="toast" role="status"></div>
+      <footer>
+        <div class="control-hints">
+          <span><kbd>W A S D</kbd> wander</span><span><kbd>SHIFT</kbd> run</span
+          ><span><kbd>MOUSE</kbd> look</span><span><kbd>E</kbd> interact</span
+          ><span><kbd>1 2 3</kbd> answer</span>
+        </div>
+        <span class="footer-note">TAKE YOUR TIME.</span>
+      </footer>
+    </div>
+    <div id="pause" class="overlay" hidden>
+      <section class="pause-card">
+        <p class="eyebrow">A MOMENT OF STILLNESS</p>
+        <h2>Stay a little.</h2>
+        <p>The gardens will be here when you return.</p>
+        <button id="resume">Continue wandering <span>↗</span></button
+        ><button id="quality" class="secondary">Detail: High</button
+        ><button id="sound" class="secondary">Sound: On</button
+        ><button id="restart" class="secondary">Start a new journey</button>
+        <p class="pause-note">Progress is saved on this device.</p>
+      </section>
+    </div>
+    <div id="briefing" class="overlay" hidden>
+      <section class="pause-card briefing-card">
+        <p class="eyebrow">TRANSMISSION 2049 · BEFORE YOU BEGIN</p>
+        <h2>NEXUS is fading.</h2>
+        <p>
+          Three ancient systems — Mind, Vision and Core — have gone offline. You are the last Reality Architect. Follow the glowing arrow, speak with the characters it marks, and finish each small task before the world disappears.
+        </p>
+        <ul class="briefing-controls">
+          <li><kbd>W A S D</kbd> walk · <kbd>SHIFT</kbd> run</li>
+          <li><kbd>MOUSE</kbd> look · <kbd>E</kbd> talk / interact / advance dialogue</li>
+          <li><kbd>1 2 3</kbd> answer challenge options</li>
+          <li><kbd>ESC</kbd> pause</li>
+        </ul>
+        <p class="pause-note">The arrow floats above your next objective. Buildings are open — walk inside.</p>
+        <button id="briefing-start">Begin restoration <span>↗</span></button>
+      </section>
+    </div>
+    <div id="ending" class="overlay" hidden>
+      <section class="pause-card">
+        <p class="eyebrow">NEXUS RESTORED · THREE SYSTEMS ONLINE</p>
+        <div class="ending-symbol">✧</div>
+        <h2>REALITY ARCHITECT</h2>
+        <p>
+          "You thought you were repairing a world.<br />You were discovering what a new generation of intelligence could make possible."
+        </p>
+        <p class="pause-note">Three systems. One intelligent world. Infinite possibilities.</p>
+        <button id="continue-results">Continue to your AI PC results <span>↗</span></button>
+        <button id="keep-playing">Enter THE NEXT GENERATION <span>↗</span></button>
+      </section>
+    </div>
+    <div id="error" class="overlay" hidden>
+      <section class="pause-card">
+        <h2>A cloud in the way.</h2>
+        <p id="error-message"></p>
+        <button onclick="location.reload()">Try again ↗</button>
+      </section>
+    </div>
+  </body>
+</html>

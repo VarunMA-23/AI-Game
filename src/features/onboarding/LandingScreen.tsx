@@ -235,7 +235,7 @@ export default function LandingScreen() {
   const handleStart = () => {
     startSession()
     recordSessionStart()
-    navigate('/setup')
+    navigate('/play')
   }
 
   return (

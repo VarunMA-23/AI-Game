@@ -1,4 +1,6 @@
 import react from '@vitejs/plugin-react'
+import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -31,9 +33,21 @@ export default defineConfig({
         globPatterns: [
           '**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff,woff2,json,webmanifest}',
         ],
+        globIgnores: ['game/**'],
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
       },
     }),
+    {
+      name: 'copy-cloudgarden',
+      closeBundle() {
+        const source = resolve(process.cwd(), 'game-dist')
+        const target = resolve(process.cwd(), 'dist/game')
+        if (!existsSync(source)) return
+        rmSync(target, { recursive: true, force: true })
+        mkdirSync(target, { recursive: true })
+        cpSync(source, target, { recursive: true })
+      },
+    },
   ],
 })
