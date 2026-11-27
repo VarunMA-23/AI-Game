@@ -122,7 +122,7 @@ button {
   padding: 10px 16px;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-muted);
   font-size: clamp(12px, 0.9vw, 15px);
   font-weight: 500;
@@ -243,7 +243,7 @@ button {
   padding: clamp(16px, 1.9vw, 28px);
   border: 1px solid var(--border-soft);
   border-radius: clamp(18px, 1.8vw, 28px);
-  background: #ffffff;
+  background: var(--surface-card);
   box-shadow: var(--shadow-lane);
 }
 
@@ -338,7 +338,7 @@ button {
   height: 10px;
   border: 2px solid var(--lane-color);
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--surface-card);
   content: '';
   transform: translateY(-50%);
 }
@@ -464,7 +464,7 @@ button {
   padding: clamp(28px, 4vw, 60px);
   border: 1px solid var(--border-soft);
   border-radius: 28px;
-  background: #ffffff;
+  background: var(--surface-card);
   box-shadow: var(--shadow-lane);
   text-align: center;
 }
@@ -503,7 +503,7 @@ button {
   padding: 0 30px;
   border: 1px solid var(--border-strong);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   cursor: pointer;
   font-family: var(--font-display);
@@ -730,7 +730,7 @@ button {
   padding: clamp(24px, 3vw, 48px);
   border: 1px solid var(--border-soft);
   border-radius: clamp(18px, 2vw, 30px);
-  background: #ffffff;
+  background: var(--surface-card);
   box-shadow: var(--shadow-lane);
 }
 
@@ -879,7 +879,7 @@ button {
   padding: clamp(18px, 1.8vw, 28px);
   border: 1px solid var(--border-soft);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--surface-card);
 }
 
 .model-card-head,
@@ -1002,7 +1002,7 @@ button {
   padding: 16px;
   border: 1px solid var(--border-soft);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--surface-card);
 }
 
 .fit-row h3 {
@@ -1034,7 +1034,7 @@ button {
   padding: 0 18px;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   cursor: pointer;
   font-size: clamp(16px, 1.05vw, 20px);
@@ -1142,7 +1142,7 @@ button {
   padding: 0 18px;
   border: 1px solid var(--border-strong);
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   font-size: 22px;
 }
@@ -1158,7 +1158,7 @@ button {
   padding: 18px;
   border: 1px solid var(--border-soft);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--surface-card);
   font-size: clamp(15px, 0.95vw, 18px);
 }
 
@@ -1290,7 +1290,7 @@ button {
   padding: clamp(16px, 2.2vw, 28px);
   border: 1px solid var(--border-soft);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--surface-card);
   box-shadow: var(--shadow-lane);
 }
 
@@ -1425,7 +1425,7 @@ button {
   padding: 8px 12px;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -1497,7 +1497,7 @@ button {
   padding: 6px 12px;
   border: 1px solid rgba(225, 29, 72, 0.4);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-rival);
   font-size: 13px;
   font-weight: 600;
@@ -1518,7 +1518,7 @@ button {
   padding: 8px 12px;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   font-size: 14px;
   font-weight: 600;
@@ -1590,7 +1590,7 @@ button {
   padding: 16px;
   border: 2px solid var(--border-soft);
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   text-align: left;
   cursor: pointer;
@@ -1720,7 +1720,7 @@ button {
   padding: 0 12px;
   border: 1px solid var(--border-strong);
   border-radius: 9px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   font-family: var(--font-display);
   font-size: 14px;
@@ -1838,7 +1838,7 @@ button {
   height: 42px;
   border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   cursor: pointer;
 }
@@ -1856,7 +1856,7 @@ button {
   padding: 6px 12px;
   border: 1px solid var(--border-soft);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--surface-card);
   font-size: 13px;
 }
 
@@ -2005,7 +2005,7 @@ button {
   padding: 6px 12px;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--color-white);
   font-size: 13px;
   font-weight: 600;
@@ -2028,7 +2028,7 @@ button {
 .live-proof-canvas {
   border-radius: 10px;
   border: 1px solid var(--border-soft);
-  background: #ffffff;
+  background: var(--surface-card);
 }
 
 .live-proof-meta {
@@ -2059,13 +2059,13 @@ button {
   padding: 22px;
   border: 2px solid var(--color-intel);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--surface-card);
   box-shadow: var(--shadow-lane);
 }
 
 .trading-card--legendary {
   border-color: #b45309;
-  background: #fffbeb;
+  background: rgba(212, 255, 82, 0.08);
 }
 
 .trading-card--epic {
@@ -2299,7 +2299,7 @@ button {
   padding: 6px 10px;
   border: 1px solid var(--border-soft);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--surface-card);
   font-size: 12px;
 }
 
@@ -2378,7 +2378,7 @@ button {
   padding: 12px 14px;
   border: 1px solid var(--border-soft);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--surface-card);
   font-size: 14px;
 }
 
@@ -2444,7 +2444,7 @@ button {
   gap: 10px;
   padding: 6px 10px;
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--surface-card);
   border: 1px solid var(--border-soft);
   font-size: 14px;
 }
