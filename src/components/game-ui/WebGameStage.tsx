@@ -93,7 +93,7 @@ function GhostLaptopPanel({
         <strong className={routedCount >= 3 ? 'web-tone-warn' : ''}>{fanLevel}</strong>
       </div>
       <div className="ghost-stat">
-        <span>Headroom meter</span>
+        <span>Battery headroom (64–76 Wh)</span>
         <strong className={ghostBattery < 50 ? 'web-tone-warn' : ''}>{ghostBattery}%</strong>
       </div>
       <div className="web-meter-track">
@@ -106,8 +106,16 @@ function GhostLaptopPanel({
         <span>Queued on CPU/GPU</span>
         <strong>{queued} task{queued === 1 ? '' : 's'} waiting</strong>
       </div>
+      <div className="ghost-cited-specs">
+        <div>
+          <strong>AI PC NPU:</strong> 11–47 TOPS <span>(Source: Intel Core Ultra Spec)</span>
+        </div>
+        <div>
+          <strong>Base TDP:</strong> 17W–28W <span>(Source: Intel Ark 125H / 258V)</span>
+        </div>
+      </div>
       <p className="ghost-note">
-        Illustrative only: without an NPU, every AI effect competes on the main processors.
+        Secondary note: queue &amp; fan states are illustrative; NPU TOPS, Wh, and TDP are published specs.
       </p>
     </aside>
   )
@@ -533,7 +541,9 @@ function StreamNightView({
     <div className="web-challenge-body">
       <div className="web-meter-box">
         <div className="web-meter-head">
-          <span>Frame stability (illustrative)</span>
+          <span>
+            Frame stability · Sourced GPU + NPU split (11–47 NPU TOPS, Intel Core Ultra Spec)
+          </span>
           <strong className={`web-tone-${stabilityTone}`}>{stabilityLabel}</strong>
         </div>
         <div className="web-meter-track">
@@ -708,7 +718,7 @@ function DeadlineDayBossView({
       <div className="web-meter-box">
         <div className="web-meter-head">
           <span>
-            Deadline Day ({Object.keys(taskChoices).length}/{DEADLINE_TASKS.length} routed) · Illustrative battery
+            Deadline Day ({Object.keys(taskChoices).length}/{DEADLINE_TASKS.length} routed) · 64–76 Wh battery, 17–28W TDP (DEL01 &amp; Intel Spec)
           </span>
           <strong className={`web-tone-${batteryTone}`}>{batteryLabel}</strong>
         </div>

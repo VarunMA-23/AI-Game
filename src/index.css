@@ -2261,3 +2261,48 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.ghost-cited-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 12px;
+  color: var(--color-white);
+}
+
+.ghost-cited-specs span {
+  color: var(--color-muted);
+}
+
+.weekly-headline {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-intel);
+}
+
+.weekly-choice-note {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+.cited-specs-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cited-spec-chip {
+  padding: 6px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 12px;
+}
+
+.cited-spec-chip span {
+  color: var(--color-muted);
+}

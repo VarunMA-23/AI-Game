@@ -31,12 +31,16 @@ export default function ValueScreen() {
   const persona = useGameStore((state) => state.persona)
   const codes = useGameStore((state) => state.recommendedModelCodes)
   const packetRoutes = useGameStore((state) => state.packetRoutes)
+  const challengeScores = useGameStore((state) => state.challengeScores)
   const setPhase = useGameStore((state) => state.setPhase)
   const [competitorId, setCompetitorId] = useState(competitorClasses[0]?.id ?? '')
   const inventory = useMemo(() => loadInventory(storeId), [storeId])
   const readiness = useMemo(() => checkStoreReadiness(inventory), [inventory])
   const definition = getPersonaDefinition(persona)
-  const weeklyReport = useMemo(() => buildWeeklyReport(packetRoutes), [packetRoutes])
+  const weeklyReport = useMemo(
+    () => buildWeeklyReport(packetRoutes, persona, challengeScores),
+    [packetRoutes, persona, challengeScores],
+  )
   const competitor =
     competitorClasses.find((item) => item.id === competitorId) ?? competitorClasses[0]
   const competitorRows = competitor ? buildCompetitorRows(competitor, definition) : []
@@ -82,13 +86,14 @@ export default function ValueScreen() {
       }
     >
       <section className="value-section weekly-report-box">
-        <h2>Your AI PC Week (Estimate)</h2>
+        <h2>Your AI PC Week — Personal Plan</h2>
+        <p className="weekly-headline">{weeklyReport.personaHeadline}</p>
         <div className="weekly-summary-strip">
           <span>
-            <strong>~{weeklyReport.totalEstimatedHoursOffloaded} hrs/week</strong> offloaded to The Quiet Assistant (estimate)
+            <strong>~{weeklyReport.totalEstimatedHoursOffloaded} hrs/week</strong> moved to The Quiet Assistant (estimate)
           </span>
           <span>
-            <strong>{weeklyReport.estimatedBatteryGainPct}</strong> illustrative battery headroom gain (estimate)
+            <strong>{weeklyReport.estimatedBatteryGainPct}</strong> battery headroom saved (estimate)
           </span>
         </div>
         <div className="fit-grid">
@@ -98,8 +103,16 @@ export default function ValueScreen() {
               <p>
                 <strong>{item.engine}</strong> · {item.estimatedHoursPerWeek}
               </p>
-              <small>{item.benefitNote}</small>
+              <p className="weekly-choice-note">{item.playerChoiceNote}</p>
+              <small>Spec basis: {item.specCitation}</small>
             </article>
+          ))}
+        </div>
+        <div className="cited-specs-strip">
+          {weeklyReport.citedSpecs.map((spec) => (
+            <div key={spec.label} className="cited-spec-chip">
+              <strong>{spec.label}:</strong> {spec.value} <span>({spec.source})</span>
+            </div>
           ))}
         </div>
         <ul className="disclosure">

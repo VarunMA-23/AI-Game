@@ -60,7 +60,10 @@ function ModelCard({
         </div>
         <div>
           <dt>NPU class</dt>
-          <dd>{shown(verifiedNpuClass(model))}</dd>
+          <dd>
+            {shown(verifiedNpuClass(model))}
+            {model.npu.tops ? ` (${model.npu.tops} TOPS)` : ''}
+          </dd>
         </div>
         <div>
           <dt>RAM</dt>
@@ -72,7 +75,7 @@ function ModelCard({
         </div>
         <div>
           <dt>Battery</dt>
-          <dd>{model.batteryWh === null ? 'Not shown' : `${model.batteryWh} Wh`}</dd>
+          <dd>{model.batteryWh === null ? 'Not shown' : `${model.batteryWh} Wh (Vendor spec)`}</dd>
         </div>
         <div>
           <dt>GPU</dt>
@@ -81,6 +84,12 @@ function ModelCard({
         <div>
           <dt>Price</dt>
           <dd>{priceWithDate(model, priceDate)}</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd>
+            {model.sourceUrls[0] ? 'Intel Core Ultra / Vendor Spec' : 'Store inventory'}
+          </dd>
         </div>
       </dl>
     </article>
