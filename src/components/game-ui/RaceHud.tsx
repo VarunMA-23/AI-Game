@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Flame, Volume2, VolumeX } from 'lucide-react'
 import BrandMark from '../common/BrandMark'
 import { gameConfig, getChallengeByIndex } from '../../game/config/loadConfig'
@@ -6,6 +6,11 @@ import { ENGINE_CHARACTERS } from '../../game/characters'
 import { gameBus } from '../../game/events/bus'
 import { isAudioMuted, setAudioMuted } from '../../services/audio/kioskAudio'
 import { useGameStore } from '../../store/gameStore'
+
+interface AnimatedPacket {
+  id: string
+  fellBack: boolean
+}
 
 export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
   const phase = useGameStore((state) => state.phase)
@@ -16,6 +21,36 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
   const lastEngineMood = useGameStore((state) => state.lastEngineMood)
   const skipChallenge = useGameStore((state) => state.skipChallenge)
   const [muted, setMuted] = useState(isAudioMuted())
+  const [packets, setPackets] = useState<AnimatedPacket[]>([])
+  const [ghostFlash, setGhostFlash] = useState(false)
+
+  useEffect(() => {
+    const timers: number[] = []
+    const unsubRouted = gameBus.on('packet:routed', (payload) => {
+      const uid = `${payload.packetId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      setPackets((prev) => [...prev.slice(-3), { id: uid, fellBack: payload.fellBack }])
+      const t = window.setTimeout(() => {
+        setPackets((prev) => prev.filter((item) => item.id !== uid))
+      }, 900)
+      timers.push(t)
+
+      if (payload.fellBack) {
+        setGhostFlash(true)
+        const f = window.setTimeout(() => setGhostFlash(false), 650)
+        timers.push(f)
+      }
+    })
+    const unsubFallback = gameBus.on('packet:fallback', () => {
+      setGhostFlash(true)
+      const f = window.setTimeout(() => setGhostFlash(false), 650)
+      timers.push(f)
+    })
+    return () => {
+      unsubRouted()
+      unsubFallback()
+      timers.forEach((t) => window.clearTimeout(t))
+    }
+  }, [])
 
   const challenge = getChallengeByIndex(currentChallenge)
   const inChallenge = phase === 'challenges' && Boolean(challenge)
@@ -107,11 +142,18 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
       <div className="hud-lanes" aria-label="Race progress">
         <div className="hud-lane hud-lane--left">
           <span className="hud-lane-label">GHOST LAPTOP (NO NPU)</span>
-          <div className="hud-lane-track">
+          <div className={`hud-lane-track ${ghostFlash ? 'hud-lane-track--flash' : ''}`}>
             <div
               className="hud-lane-fill"
               style={{ width: `${race.leftProgress * 100}%` }}
             />
+            {packets.map((pkt) => (
+              <span
+                key={`left-${pkt.id}`}
+                className={`hud-packet-pill hud-packet-pill--left ${pkt.fellBack ? 'hud-packet-pill--bounce' : ''}`}
+                aria-hidden="true"
+              />
+            ))}
           </div>
         </div>
         <div className="hud-lane hud-lane--right">
@@ -121,6 +163,13 @@ export default function RaceHud({ onSkip }: { onSkip?: () => void }) {
               className="hud-lane-fill"
               style={{ width: `${race.rightProgress * 100}%` }}
             />
+            {packets.map((pkt) => (
+              <span
+                key={`right-${pkt.id}`}
+                className={`hud-packet-pill hud-packet-pill--right ${pkt.fellBack ? 'hud-packet-pill--bounce' : ''}`}
+                aria-hidden="true"
+              />
+            ))}
           </div>
         </div>
       </div>

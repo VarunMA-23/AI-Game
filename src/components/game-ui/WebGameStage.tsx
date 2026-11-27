@@ -24,7 +24,12 @@ import type { ProcessingChoice } from '../../game/scoring/privacyShield'
 import { scoreStreamNight } from '../../game/scoring/streamNight'
 import type { StreamNightChoice } from '../../game/scoring/streamNight'
 import { scoreStudySprint } from '../../game/scoring/studySprint'
-import { playCompleteChord, playGoodChime, playWarnHum } from '../../services/audio/kioskAudio'
+import {
+  playCompleteChord,
+  playGoodChime,
+  playTaskArrivalTick,
+  playWarnHum,
+} from '../../services/audio/kioskAudio'
 import { listDailyLeaderboard, recordLeaderboardScore } from '../../services/storage/leaderboardStorage'
 import { useGameStore } from '../../store/gameStore'
 import type { ChallengeDefinition, ChallengeId, Engine, PacketRoute } from '../../types/game'
@@ -76,13 +81,16 @@ function EngineButtons({
 function GhostLaptopPanel({
   routedCount,
   fallbacks,
+  combo,
 }: {
   routedCount: number
   fallbacks: number
+  combo: number
 }) {
   const fanLevel = routedCount === 0 ? 'Quiet' : routedCount < 3 ? 'Warming up' : 'Loud (Max RPM)'
   const ghostBattery = Math.max(18, 100 - routedCount * 14 - fallbacks * 6)
   const queued = Math.max(0, routedCount - 1)
+  const stalled = combo >= 3
 
   return (
     <aside className="ghost-laptop-panel" aria-label="Illustrative Ghost Laptop comparison">
@@ -90,6 +98,11 @@ function GhostLaptopPanel({
         <span className="ghost-badge">ILLUSTRATION · NO NPU</span>
         <strong>Standard Ghost Laptop</strong>
       </div>
+      {stalled && (
+        <div className="ghost-stall-toast" role="status">
+          ⚡ Ghost Laptop just stalled on queued tasks!
+        </div>
+      )}
       <div className="ghost-stat">
         <span><Fan size={14} aria-hidden="true" /> Fan noise</span>
         <strong className={routedCount >= 3 ? 'web-tone-warn' : ''}>{fanLevel}</strong>
@@ -401,10 +414,13 @@ function PrivacyShieldView({
   const handleRoute = (picked: ProcessingChoice) => {
     if (choice) return
     setChoice(picked)
+    if (picked === 'local') {
+      setShowLiveProof(true)
+    }
     onRoute('confidential-document', picked === 'local' ? 'NPU' : 'CPU')
     onFeedback(
       picked === 'local'
-        ? 'The Quiet Assistant: "Kept 100% on-device. Now answer the follow-up below."'
+        ? 'The Quiet Assistant: "Kept 100% on-device. Live offline proof expanded below!"'
         : 'Cloud route sent the document off-device. Answer the follow-up below.',
       picked === 'local' ? 'success' : 'warn',
     )
@@ -660,7 +676,13 @@ function DeadlineDayBossView({
   useEffect(() => {
     if (visibleCount >= DEADLINE_TASKS.length) return
     const timer = window.setInterval(() => {
-      setVisibleCount((c) => Math.min(DEADLINE_TASKS.length, c + 1))
+      setVisibleCount((c) => {
+        const next = Math.min(DEADLINE_TASKS.length, c + 1)
+        if (next > c) {
+          playTaskArrivalTick()
+        }
+        return next
+      })
     }, 2200)
     return () => window.clearInterval(timer)
   }, [visibleCount])
@@ -733,7 +755,14 @@ function DeadlineDayBossView({
           <span>
             Deadline Day ({Object.keys(taskChoices).length}/{DEADLINE_TASKS.length} routed) · 64–76 Wh battery, 17–28W TDP (DEL01 &amp; Intel Spec)
           </span>
-          <strong className={`web-tone-${batteryTone}`}>{batteryLabel}</strong>
+          <div className="boss-status-pills">
+            {visibleCount < DEADLINE_TASKS.length && (
+              <span className="boss-queue-pulse">
+                INCOMING TASK QUEUE ({visibleCount}/{DEADLINE_TASKS.length})
+              </span>
+            )}
+            <strong className={`web-tone-${batteryTone}`}>{batteryLabel}</strong>
+          </div>
         </div>
         <div className="web-meter-track">
           <div
@@ -744,10 +773,11 @@ function DeadlineDayBossView({
       </div>
 
       <div className="web-task-list">
-        {arriving.map((task) => {
+        {arriving.map((task, idx) => {
           const picked = taskChoices[task.id]
+          const isNewlyArrived = idx >= 2 && idx === visibleCount - 1 && !picked
           return (
-            <div key={task.id} className="web-task-row">
+            <div key={task.id} className={`web-task-row ${isNewlyArrived ? 'boss-task-arrive' : ''}`}>
               <div className="web-task-info">
                 <strong>{task.title}</strong>
                 <span className="web-task-sub">{task.hint}</span>
@@ -788,6 +818,7 @@ export default function WebGameStage({
   const phase = useGameStore((s) => s.phase)
   const currentChallenge = useGameStore((s) => s.currentChallenge)
   const race = useGameStore((s) => s.race)
+  const combo = useGameStore((s) => s.combo ?? 0)
   const challengeStatus = useGameStore((s) => s.challengeStatus)
 
   const challenge =
@@ -1025,7 +1056,7 @@ export default function WebGameStage({
           {challenge.id === 'battery-escape' && <DeadlineDayBossView {...props} />}
         </div>
 
-        <GhostLaptopPanel routedCount={routedCount} fallbacks={fallbackCount} />
+        <GhostLaptopPanel routedCount={routedCount} fallbacks={fallbackCount} combo={combo} />
       </div>
 
       {isCompleted && (

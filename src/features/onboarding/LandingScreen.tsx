@@ -97,7 +97,10 @@ export default function LandingScreen() {
           </h1>
 
           <p className="hero-subtitle">
-            5 interactive challenges. One smarter choice.
+            Don&apos;t buy a pretty laptop that chokes on AI next year — test what&apos;s under the hood in 2 minutes.
+          </p>
+          <p className="hero-subhook">
+            5 interactive challenges · One smarter choice
           </p>
 
           <div className="hero-actions">

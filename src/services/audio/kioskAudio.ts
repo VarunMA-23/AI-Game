@@ -80,3 +80,8 @@ export const playCompleteChord = (): void => {
   }
 }
 
+export const playTaskArrivalTick = (): void => {
+  playTone(740, 0.08, 'sine', 0.05, 0)
+  playTone(987.77, 0.1, 'sine', 0.04, 0.05)
+}
+
